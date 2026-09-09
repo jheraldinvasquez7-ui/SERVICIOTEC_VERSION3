@@ -1153,19 +1153,35 @@ function textoValido(valor: string | null | undefined): boolean {
 /* Contenedor principal de la aplicación */
 .contenedor-app {
   min-height: 100vh;
+  width: 100%;
   background-color: #f1f5f9;
-  color: #1e293b;
-  padding: 1.5rem 1rem;
+  color: #0f172a;
+  font-size: 1.02rem;
+  padding: 1.5rem 2rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
 }
 
 .max-ancho {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+html, body, #app {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .contenedor-app {
+    padding: 1rem;
+  }
 }
 
 /* Barra superior de encabezado */
@@ -1536,8 +1552,8 @@ function textoValido(valor: string | null | undefined): boolean {
 
 /* Detalles del servicio técnico */
 .detalles-servicio {
-  font-size: 0.875rem;
-  color: #334155;
+  font-size: 0.95rem;
+  color: #1e293b;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -1558,10 +1574,10 @@ function textoValido(valor: string | null | undefined): boolean {
 .tag-reparacion {
   background-color: #f1f5f9;
   border: 1px solid #cbd5e1;
-  color: #1e293b;
+  color: #0f172a;
   padding: 0.2rem 0.5rem;
   border-radius: 3px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
@@ -1800,15 +1816,15 @@ function textoValido(valor: string | null | undefined): boolean {
 }
 
 .form-label {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #334155;
+  color: #1e293b;
   margin-bottom: 0.25rem;
 }
 
 .form-label-bold {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 0.35rem;
@@ -1872,8 +1888,8 @@ function textoValido(valor: string | null | undefined): boolean {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.875rem;
-  color: #1e293b;
+  font-size: 0.95rem;
+  color: #0f172a;
   cursor: pointer;
   user-select: none;
 }
