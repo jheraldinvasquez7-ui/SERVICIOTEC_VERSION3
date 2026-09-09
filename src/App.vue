@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useLocalStorage } from '@vueuse/core';
 
 // Interfaz para cada servicio técnico
@@ -8,9 +8,9 @@ interface ServicioTecnico {
   cliente: string;
   marca: string;
   modelo: string;
-  tiposReparacion: string[]; // Varias fallas o tipos de reparación
-  otroTipoReparacion?: string; // Especificación si escogió 'Otro'
-  tipoReparacion?: string; // Compatibilidad hacia atrás
+  tiposReparacion: string[];
+  otroTipoReparacion?: string;
+  tipoReparacion?: string;
   tecnico: string;
   fechaRecepcion: string;
   precio: number;
@@ -23,7 +23,7 @@ interface ServicioTecnico {
   fechaEntrega?: string;
 }
 
-// Datos iniciales de ejemplo
+// Datos iniciales de demostración
 const datosIniciales: ServicioTecnico[] = [
   {
     id: 'SRV-101',
@@ -77,156 +77,23 @@ const datosIniciales: ServicioTecnico[] = [
   }
 ];
 
-// Persistencia obligatoria con useLocalStorage
+// Persistencia en localStorage
 const servicios = useLocalStorage<ServicioTecnico[]>('taller_don_efrain_datos_v5', datosIniciales);
 
-// Opciones de selección
+// Catálogo de marcas y modelos
 const listaMarcas = ['Samsung', 'Apple', 'Xiaomi', 'Motorola', 'Huawei', 'Oppo', 'Infinix', 'Tecno', 'Honor', 'Otra'];
 
-// Modelos por marca para selección dinámica
 const modelosPorMarca: Record<string, string[]> = {
-  Samsung: [
-    'Galaxy A05',
-    'Galaxy A14',
-    'Galaxy A15',
-    'Galaxy A24',
-    'Galaxy A25',
-    'Galaxy A34',
-    'Galaxy A35',
-    'Galaxy A54',
-    'Galaxy A55',
-    'Galaxy S21',
-    'Galaxy S22',
-    'Galaxy S23',
-    'Galaxy S23 Ultra',
-    'Galaxy S24',
-    'Galaxy S24 Ultra',
-    'Galaxy Z Flip 5',
-    'Galaxy Z Fold 5',
-    'Otro modelo'
-  ],
-  Apple: [
-    'iPhone X / XR',
-    'iPhone 11',
-    'iPhone 11 Pro / Max',
-    'iPhone 12',
-    'iPhone 12 Pro / Max',
-    'iPhone 13',
-    'iPhone 13 Pro / Max',
-    'iPhone 14',
-    'iPhone 14 Pro / Max',
-    'iPhone 15',
-    'iPhone 15 Pro',
-    'iPhone 15 Pro Max',
-    'iPhone 16',
-    'iPhone 16 Pro / Max',
-    'iPhone SE',
-    'iPad / Tablet',
-    'Otro modelo'
-  ],
-  Xiaomi: [
-    'Redmi 10',
-    'Redmi 12',
-    'Redmi 13C',
-    'Redmi Note 10',
-    'Redmi Note 11',
-    'Redmi Note 12',
-    'Redmi Note 13',
-    'Redmi Note 13 Pro',
-    'Poco X5 Pro',
-    'Poco X6 Pro',
-    'Poco M5',
-    'Poco F5',
-    'Xiaomi 13T',
-    'Xiaomi 14',
-    'Otro modelo'
-  ],
-  Motorola: [
-    'Moto G13',
-    'Moto G14',
-    'Moto G22',
-    'Moto G23',
-    'Moto G52',
-    'Moto G54',
-    'Moto G84',
-    'Moto E13',
-    'Moto E22',
-    'Moto Edge 30',
-    'Moto Edge 40',
-    'Moto Edge 50',
-    'Otro modelo'
-  ],
-  Huawei: [
-    'Nova 9',
-    'Nova 10',
-    'Nova 11',
-    'Nova 11i',
-    'Nova Y61',
-    'Nova Y70',
-    'Nova Y90',
-    'P40 Lite',
-    'P50 Pro',
-    'P60 Pro',
-    'Mate 40 Pro',
-    'Mate 50 Pro',
-    'Otro modelo'
-  ],
-  Oppo: [
-    'Reno 7',
-    'Reno 10',
-    'Reno 11',
-    'Reno 11 F',
-    'A17',
-    'A38',
-    'A58',
-    'A78',
-    'A79',
-    'Find N2 Flip',
-    'Otro modelo'
-  ],
-  Infinix: [
-    'Hot 30',
-    'Hot 30i',
-    'Hot 40',
-    'Hot 40 Pro',
-    'Note 30',
-    'Note 30 Pro',
-    'Note 40',
-    'Zero 30',
-    'Smart 7',
-    'Smart 8',
-    'Otro modelo'
-  ],
-  Tecno: [
-    'Spark 10',
-    'Spark 10 Pro',
-    'Spark 20',
-    'Spark 20 Pro',
-    'Camon 20',
-    'Camon 20 Pro',
-    'Camon 30',
-    'Pova 5',
-    'Pova 6 Neo',
-    'Pop 7',
-    'Pop 8',
-    'Otro modelo'
-  ],
-  Honor: [
-    'Honor X6a',
-    'Honor X7a',
-    'Honor X7b',
-    'Honor X8a',
-    'Honor X8b',
-    'Honor 90',
-    'Honor 90 Lite',
-    'Honor 200',
-    'Magic 5 Lite',
-    'Magic 6 Lite',
-    'Otro modelo'
-  ],
-  Otra: [
-    'Otro modelo'
-  ]
+  Samsung: ['Galaxy A05', 'Galaxy A14', 'Galaxy A15', 'Galaxy A24', 'Galaxy A25', 'Galaxy A34', 'Galaxy A35', 'Galaxy A54', 'Galaxy A55', 'Galaxy S21', 'Galaxy S22', 'Galaxy S23', 'Galaxy S23 Ultra', 'Galaxy S24', 'Galaxy S24 Ultra', 'Galaxy Z Flip 5', 'Galaxy Z Fold 5', 'Otro modelo'],
+  Apple: ['iPhone X / XR', 'iPhone 11', 'iPhone 11 Pro / Max', 'iPhone 12', 'iPhone 12 Pro / Max', 'iPhone 13', 'iPhone 13 Pro / Max', 'iPhone 14', 'iPhone 14 Pro / Max', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro / Max', 'iPhone SE', 'iPad / Tablet', 'Otro modelo'],
+  Xiaomi: ['Redmi 10', 'Redmi 12', 'Redmi 13C', 'Redmi Note 10', 'Redmi Note 11', 'Redmi Note 12', 'Redmi Note 13', 'Redmi Note 13 Pro', 'Poco X5 Pro', 'Poco X6 Pro', 'Poco M5', 'Poco F5', 'Xiaomi 13T', 'Xiaomi 14', 'Otro modelo'],
+  Motorola: ['Moto G13', 'Moto G14', 'Moto G22', 'Moto G23', 'Moto G52', 'Moto G54', 'Moto G84', 'Moto E13', 'Moto E22', 'Moto Edge 30', 'Moto Edge 40', 'Moto Edge 50', 'Otro modelo'],
+  Huawei: ['Nova 9', 'Nova 10', 'Nova 11', 'Nova 11i', 'Nova Y61', 'Nova Y70', 'Nova Y90', 'P40 Lite', 'P50 Pro', 'P60 Pro', 'Mate 40 Pro', 'Mate 50 Pro', 'Otro modelo'],
+  Oppo: ['Reno 7', 'Reno 10', 'Reno 11', 'Reno 11 F', 'A17', 'A38', 'A58', 'A78', 'A79', 'Find N2 Flip', 'Otro modelo'],
+  Infinix: ['Hot 30', 'Hot 30i', 'Hot 40', 'Hot 40 Pro', 'Note 30', 'Note 30 Pro', 'Note 40', 'Zero 30', 'Smart 7', 'Smart 8', 'Otro modelo'],
+  Tecno: ['Spark 10', 'Spark 10 Pro', 'Spark 20', 'Spark 20 Pro', 'Camon 20', 'Camon 20 Pro', 'Camon 30', 'Pova 5', 'Pova 6 Neo', 'Pop 7', 'Pop 8', 'Otro modelo'],
+  Honor: ['Honor X6a', 'Honor X7a', 'Honor X7b', 'Honor X8a', 'Honor X8b', 'Honor 90', 'Honor 90 Lite', 'Honor 200', 'Magic 5 Lite', 'Magic 6 Lite', 'Otro modelo'],
+  Otra: ['Otro modelo']
 };
 
 function obtenerModelosDeMarca(nombreMarca: string): string[] {
@@ -244,24 +111,26 @@ const listaReparaciones = [
 ];
 const listaTecnicos = ['Don Efraín', 'Andrés (Técnico)', 'Carlos (Técnico)'];
 
-// Control de ventanas emergentes (Modales)
+// Modales
 const mostrarFormulario = ref(false);
 const esEdicion = ref(false);
 const idEditando = ref('');
 
-// Campos reactivos del formulario (solo ref)
+// Campos del formulario reactivo
 const cliente = ref('');
 const marca = ref('Samsung');
-const modeloSeleccionado = ref('Galaxy A15');
-const otroModeloTexto = ref('');
-const tiposReparacionSeleccionados = ref<string[]>([]);
+const modelo = ref('');
+const modeloPersonalizado = ref('');
+const tiposReparacion = ref<string[]>([]);
 const otroTipoReparacion = ref('');
 const tecnico = ref('Don Efraín');
 const fechaRecepcion = ref('');
 const precio = ref<number | null>(null);
+const precioTexto = ref('');
 const metodoPago = ref('Efectivo');
 const estadoPago = ref<'Pagado' | 'Pendiente' | 'Abono'>('Pendiente');
 const valorAbono = ref<number | null>(null);
+const valorAbonoTexto = ref('');
 const estadoEquipo = ref<'Recibido' | 'En reparación' | 'Listo para entregar' | 'Entregado'>('Recibido');
 const observaciones = ref('');
 
@@ -269,223 +138,221 @@ const observaciones = ref('');
 const errorCliente = ref('');
 const errorModelo = ref('');
 const errorReparacion = ref('');
-const errorOtro = ref('');
 const errorPrecio = ref('');
 const errorAbono = ref('');
 const errorEstadoEquipo = ref('');
 
-// Búsqueda
-const busqueda = ref('');
+// Filtros y buscador
+const textoBusqueda = ref('');
+const filtroEstadoSeleccionado = ref('');
+const mensajeNotificacion = ref('');
 
-// Mensaje de notificación
-const mensajeAviso = ref('');
+// Modal de entrega y calificación
+const mostrarModalEntrega = ref(false);
+const servicioParaEntregar = ref<ServicioTecnico | null>(null);
+const calificacionSeleccionada = ref(5);
+const hoverEstrellas = ref(0);
 
-// Modales de entrega y eliminación
-const modalEntregar = ref(false);
-const servicioAEntregar = ref<ServicioTecnico | null>(null);
-const estrellasCalificacion = ref(5);
+// Modal de eliminación
+const mostrarModalEliminar = ref(false);
+const idParaEliminar = ref('');
 
-const modalEliminar = ref(false);
-const servicioAEliminar = ref<ServicioTecnico | null>(null);
-
-// Función para obtener fecha actual formateada
+// Fecha actual formateada
 function obtenerFechaActual(): string {
-  const f = new Date();
-  const anio = f.getFullYear();
-  const mes = String(f.getMonth() + 1).padStart(2, '0');
-  const dia = String(f.getDate()).padStart(2, '0');
-  let hora = f.getHours();
-  const min = String(f.getMinutes()).padStart(2, '0');
-  const ampm = hora >= 12 ? 'PM' : 'AM';
-  hora = hora % 12 || 12;
-  return `${anio}-${mes}-${dia} ${String(hora).padStart(2, '0')}:${min} ${ampm}`;
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  let horas = ahora.getHours();
+  const minutos = String(ahora.getMinutes()).padStart(2, '0');
+  const ampm = horas >= 12 ? 'PM' : 'AM';
+  horas = horas % 12;
+  horas = horas ? horas : 12;
+  const horasStr = String(horas).padStart(2, '0');
+  return `${anio}-${mes}-${dia} ${horasStr}:${minutos} ${ampm}`;
 }
 
-// Función formato pesos colombianos
+// Formato de moneda
 function formatoPesos(valor: number): string {
-  if (valor === null || valor === undefined || isNaN(valor)) return '$0';
   return '$' + valor.toLocaleString('es-CO');
 }
 
-// Función para calcular saldo restante
+// Formatear números con puntos de miles (140000 -> "140.000")
+function formatearConPuntos(valor: number | string | null | undefined): string {
+  if (valor === null || valor === undefined || valor === '') return '';
+  const soloDigitos = String(valor).replace(/\D/g, '');
+  if (!soloDigitos) return '';
+  const num = parseInt(soloDigitos, 10);
+  if (isNaN(num)) return '';
+  return num.toLocaleString('es-CO');
+}
+
+// Entrada interactiva con colocación automática de puntos para Precio
+function onInputPrecio(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const soloDigitos = target.value.replace(/\D/g, '');
+  if (!soloDigitos) {
+    precio.value = null;
+    precioTexto.value = '';
+    target.value = '';
+  } else {
+    const num = parseInt(soloDigitos, 10);
+    precio.value = num;
+    const formateado = num.toLocaleString('es-CO');
+    precioTexto.value = formateado;
+    target.value = formateado;
+  }
+  errorPrecio.value = '';
+  validarEstadoEquipoEnVivo();
+}
+
+// Entrada interactiva con colocación automática de puntos para Abono
+function onInputAbono(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const soloDigitos = target.value.replace(/\D/g, '');
+  if (!soloDigitos) {
+    valorAbono.value = null;
+    valorAbonoTexto.value = '';
+    target.value = '';
+  } else {
+    const num = parseInt(soloDigitos, 10);
+    valorAbono.value = num;
+    const formateado = num.toLocaleString('es-CO');
+    valorAbonoTexto.value = formateado;
+    target.value = formateado;
+  }
+  errorAbono.value = '';
+  validarEstadoEquipoEnVivo();
+}
+
+// Calcular saldo pendiente
 function calcularPendiente(item: ServicioTecnico): number {
   if (item.estadoPago === 'Pagado') return 0;
   if (item.estadoPago === 'Pendiente') return item.precio;
   if (item.estadoPago === 'Abono') {
-    const falta = item.precio - (item.valorAbono || 0);
-    return falta > 0 ? falta : 0;
+    return Math.max(0, item.precio - (item.valorAbono || 0));
   }
   return 0;
 }
 
-// Función para obtener lista de fallas a mostrar
-function obtenerFallas(item: any): string[] {
-  if (Array.isArray(item.tiposReparacion) && item.tiposReparacion.length > 0) {
-    const lista: string[] = [];
-    for (let i = 0; i < item.tiposReparacion.length; i++) {
-      const rep = item.tiposReparacion[i];
-      if (rep === 'Otro' && item.otroTipoReparacion) {
-        lista.push('Otro: ' + item.otroTipoReparacion);
-      } else {
-        lista.push(rep);
-      }
+// Resumen métrico de estados
+const conteosPorEstado = computed(() => {
+  const totales = {
+    recibidos: 0,
+    enReparacion: 0,
+    listos: 0,
+    entregados: 0,
+    total: servicios.value.length
+  };
+  for (const s of servicios.value) {
+    if (s.estadoEquipo === 'Recibido') totales.recibidos++;
+    else if (s.estadoEquipo === 'En reparación') totales.enReparacion++;
+    else if (s.estadoEquipo === 'Listo para entregar') totales.listos++;
+    else if (s.estadoEquipo === 'Entregado') totales.entregados++;
+  }
+  return totales;
+});
+
+// Filtrado de servicios
+const serviciosFiltrados = computed(() => {
+  const query = textoBusqueda.value.toLowerCase().trim();
+  return servicios.value.filter(s => {
+    if (filtroEstadoSeleccionado.value && s.estadoEquipo !== filtroEstadoSeleccionado.value) {
+      return false;
     }
-    return lista;
-  }
-  if (item.tipoReparacion) {
-    return [item.tipoReparacion];
-  }
-  return ['Sin especificar'];
-}
-
-// Saber si 'Otro' está seleccionado
-function tieneOtroSeleccionado(): boolean {
-  return tiposReparacionSeleccionados.value.includes('Otro');
-}
-
-// Filtrar la lista de servicios
-function listaFiltrada(): ServicioTecnico[] {
-  const q = busqueda.value.toLowerCase().trim();
-  if (!q) return servicios.value;
-  return servicios.value.filter((s) => {
-    return (
-      s.cliente.toLowerCase().includes(q) ||
-      s.marca.toLowerCase().includes(q) ||
-      s.modelo.toLowerCase().includes(q) ||
-      s.id.toLowerCase().includes(q)
-    );
+    if (!query) return true;
+    const enCliente = s.cliente.toLowerCase().includes(query);
+    const enMarca = s.marca.toLowerCase().includes(query);
+    const enModelo = s.modelo.toLowerCase().includes(query);
+    const enId = s.id.toLowerCase().includes(query);
+    const enTecnico = s.tecnico.toLowerCase().includes(query);
+    const enTipos = (s.tiposReparacion || []).some(t => t.toLowerCase().includes(query));
+    return enCliente || enMarca || enModelo || enId || enTecnico || enTipos;
   });
-}
+});
 
-// Mostrar aviso temporal
-function mostrarMensaje(texto: string) {
-  mensajeAviso.value = texto;
-  setTimeout(() => {
-    mensajeAviso.value = '';
-  }, 3500);
-}
-
-// Comprueba que no esté vacío, ni sean solo espacios en blanco, y contenga letras válidas
-function tieneLetrasValidas(texto: string | null | undefined): boolean {
-  if (!texto) return false;
-  const limpio = texto.trim();
-  if (limpio.length === 0) return false;
-  return /[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(limpio);
-}
-
-// Comprueba que no esté vacío, ni sean solo espacios, y contenga letras o números válidos
-function tieneTextoAlfanumericoValido(texto: string | null | undefined): boolean {
-  if (!texto) return false;
-  const limpio = texto.trim();
-  if (limpio.length === 0) return false;
-  return /[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]/.test(limpio);
-}
-
-// Calcular saldo pendiente actual dentro del formulario
-function saldoPendienteFormulario(): number {
-  const p = Number(precio.value) || 0;
-  if (estadoPago.value === 'Pagado') return 0;
-  if (estadoPago.value === 'Pendiente') return p;
-  if (estadoPago.value === 'Abono') {
-    const ab = Number(valorAbono.value) || 0;
-    return Math.max(0, p - ab);
-  }
-  return 0;
-}
-
-// Validación en tiempo real para no permitir espacios vacíos como información
-function validarClienteEnVivo() {
-  if (cliente.value.length > 0) {
-    if (cliente.value.trim() === '') {
-      errorCliente.value = 'Los espacios vacíos no son válidos como información.';
-    } else if (!tieneLetrasValidas(cliente.value)) {
-      errorCliente.value = 'El nombre del cliente debe contener letras válidas.';
-    } else {
-      errorCliente.value = '';
-    }
+function filtrarPorEstado(estado: string) {
+  if (filtroEstadoSeleccionado.value === estado) {
+    filtroEstadoSeleccionado.value = '';
   } else {
-    errorCliente.value = '';
+    filtroEstadoSeleccionado.value = estado;
   }
 }
 
-function validarModeloEnVivo() {
-  if (otroModeloTexto.value.length > 0) {
-    if (otroModeloTexto.value.trim() === '') {
-      errorModelo.value = 'Los espacios vacíos no son válidos como información.';
-    } else if (!tieneTextoAlfanumericoValido(otroModeloTexto.value)) {
-      errorModelo.value = 'El modelo debe contener letras o números (no solo espacios).';
-    } else {
-      errorModelo.value = '';
-    }
-  } else {
-    errorModelo.value = '';
-  }
+function limpiarFiltros() {
+  textoBusqueda.value = '';
+  filtroEstadoSeleccionado.value = '';
 }
 
-function validarOtroEnVivo() {
-  if (otroTipoReparacion.value.length > 0) {
-    if (otroTipoReparacion.value.trim() === '') {
-      errorOtro.value = 'Los espacios vacíos no son válidos como información.';
-    } else if (!tieneLetrasValidas(otroTipoReparacion.value)) {
-      errorOtro.value = 'La descripción de la falla debe contener letras válidas.';
-    } else {
-      errorOtro.value = '';
-    }
+function alCambiarMarca() {
+  const modelos = obtenerModelosDeMarca(marca.value);
+  modelo.value = modelos[0] || 'Otro modelo';
+  modeloPersonalizado.value = '';
+}
+
+function toggleReparacion(tipo: string) {
+  const idx = tiposReparacion.value.indexOf(tipo);
+  if (idx === -1) {
+    tiposReparacion.value.push(tipo);
   } else {
-    errorOtro.value = '';
+    tiposReparacion.value.splice(idx, 1);
   }
+  errorReparacion.value = '';
+}
+
+function alCambiarEstadoPago() {
+  if (estadoPago.value === 'Pagado') {
+    valorAbono.value = precio.value || 0;
+    valorAbonoTexto.value = precio.value ? formatearConPuntos(precio.value) : '';
+  } else if (estadoPago.value === 'Pendiente') {
+    valorAbono.value = 0;
+    valorAbonoTexto.value = '';
+  } else if (estadoPago.value === 'Abono') {
+    if (valorAbono.value === null || valorAbono.value === 0) {
+      valorAbono.value = null;
+      valorAbonoTexto.value = '';
+    }
+  }
+  validarEstadoEquipoEnVivo();
 }
 
 function validarEstadoEquipoEnVivo() {
-  if (estadoEquipo.value === 'Entregado' && saldoPendienteFormulario() > 0) {
-    errorEstadoEquipo.value = ` No se puede entregar: El cliente tiene saldo pendiente (${formatoPesos(saldoPendienteFormulario())}).`;
-  } else {
-    errorEstadoEquipo.value = '';
+  errorEstadoEquipo.value = '';
+  if (estadoEquipo.value === 'Entregado') {
+    if (estadoPago.value !== 'Pagado') {
+      const p = precio.value || 0;
+      const a = valorAbono.value || 0;
+      if (p <= 0 || a < p) {
+        errorEstadoEquipo.value = 'Para entregar el equipo debe estar completamente Pagado (Saldo: $0).';
+      }
+    }
   }
 }
 
-// Al cambiar marca, actualizar automáticamente el modelo sugerido
-function alCambiarMarca() {
-  const lista = obtenerModelosDeMarca(marca.value);
-  if (lista && lista.length > 0) {
-    modeloSeleccionado.value = lista[0];
-  } else {
-    modeloSeleccionado.value = 'Otro modelo';
-  }
-  otroModeloTexto.value = '';
-  errorModelo.value = '';
-}
-
-function alCambiarModelo() {
-  if (modeloSeleccionado.value !== 'Otro modelo' && marca.value !== 'Otra') {
-    otroModeloTexto.value = '';
-  }
-  errorModelo.value = '';
-}
-
-// Abrir formulario para nuevo servicio
-function abrirCrear() {
+function abrirModalNuevo() {
   esEdicion.value = false;
   idEditando.value = '';
   cliente.value = '';
   marca.value = 'Samsung';
-  modeloSeleccionado.value = 'Galaxy A15';
-  otroModeloTexto.value = '';
-  tiposReparacionSeleccionados.value = ['Cambio de pantalla'];
+  const modelos = obtenerModelosDeMarca('Samsung');
+  modelo.value = modelos[0] || 'Galaxy A15';
+  modeloPersonalizado.value = '';
+  tiposReparacion.value = [];
   otroTipoReparacion.value = '';
   tecnico.value = 'Don Efraín';
   fechaRecepcion.value = obtenerFechaActual();
   precio.value = null;
+  precioTexto.value = '';
   metodoPago.value = 'Efectivo';
   estadoPago.value = 'Pendiente';
   valorAbono.value = null;
+  valorAbonoTexto.value = '';
   estadoEquipo.value = 'Recibido';
   observaciones.value = '';
 
   errorCliente.value = '';
   errorModelo.value = '';
   errorReparacion.value = '';
-  errorOtro.value = '';
   errorPrecio.value = '';
   errorAbono.value = '';
   errorEstadoEquipo.value = '';
@@ -493,49 +360,44 @@ function abrirCrear() {
   mostrarFormulario.value = true;
 }
 
-// Abrir formulario para editar
-function abrirEditar(item: ServicioTecnico) {
-  if (item.estadoEquipo === 'Entregado') {
-    mostrarMensaje('No se puede editar un servicio que ya fue entregado.');
-    return;
-  }
-
+function abrirModalEditar(item: ServicioTecnico) {
   esEdicion.value = true;
   idEditando.value = item.id;
   cliente.value = item.cliente;
   marca.value = item.marca;
 
-  const modelosDisp = obtenerModelosDeMarca(item.marca);
-  if (modelosDisp.includes(item.modelo)) {
-    modeloSeleccionado.value = item.modelo;
-    otroModeloTexto.value = '';
+  const modelosValidos = obtenerModelosDeMarca(item.marca);
+  if (modelosValidos.includes(item.modelo)) {
+    modelo.value = item.modelo;
+    modeloPersonalizado.value = '';
   } else {
-    modeloSeleccionado.value = 'Otro modelo';
-    otroModeloTexto.value = item.modelo;
+    modelo.value = 'Otro modelo';
+    modeloPersonalizado.value = item.modelo;
   }
 
-  if (Array.isArray(item.tiposReparacion) && item.tiposReparacion.length > 0) {
-    tiposReparacionSeleccionados.value = [...item.tiposReparacion];
+  if (item.tiposReparacion && Array.isArray(item.tiposReparacion)) {
+    tiposReparacion.value = [...item.tiposReparacion];
   } else if (item.tipoReparacion) {
-    tiposReparacionSeleccionados.value = [item.tipoReparacion];
+    tiposReparacion.value = [item.tipoReparacion];
   } else {
-    tiposReparacionSeleccionados.value = ['Cambio de pantalla'];
+    tiposReparacion.value = [];
   }
 
   otroTipoReparacion.value = item.otroTipoReparacion || '';
   tecnico.value = item.tecnico;
   fechaRecepcion.value = item.fechaRecepcion;
   precio.value = item.precio;
+  precioTexto.value = item.precio ? formatearConPuntos(item.precio) : '';
   metodoPago.value = item.metodoPago;
   estadoPago.value = item.estadoPago;
   valorAbono.value = item.valorAbono;
+  valorAbonoTexto.value = item.valorAbono ? formatearConPuntos(item.valorAbono) : '';
   estadoEquipo.value = item.estadoEquipo;
   observaciones.value = item.observaciones;
 
   errorCliente.value = '';
   errorModelo.value = '';
   errorReparacion.value = '';
-  errorOtro.value = '';
   errorPrecio.value = '';
   errorAbono.value = '';
   errorEstadoEquipo.value = '';
@@ -543,544 +405,502 @@ function abrirEditar(item: ServicioTecnico) {
   mostrarFormulario.value = true;
 }
 
-// Cerrar formulario
-function cancelarFormulario() {
+function cerrarFormulario() {
   mostrarFormulario.value = false;
 }
 
-// Guardar servicio
-function guardarServicio() {
-  let correcto = true;
+function validarFormulario(): boolean {
+  let valido = true;
   errorCliente.value = '';
   errorModelo.value = '';
   errorReparacion.value = '';
-  errorOtro.value = '';
   errorPrecio.value = '';
   errorAbono.value = '';
   errorEstadoEquipo.value = '';
 
-  // 1. Validar nombre del cliente: no vacío, no solo espacios, debe tener letras válidas
-  if (!cliente.value || cliente.value.trim() === '') {
-    errorCliente.value = 'El nombre del cliente no puede estar vacío ni contener solo espacios.';
-    correcto = false;
-  } else if (!tieneLetrasValidas(cliente.value)) {
-    errorCliente.value = 'El nombre del cliente debe contener letras (los espacios o signos solos no son válidos).';
-    correcto = false;
+  if (!cliente.value.trim()) {
+    errorCliente.value = 'El nombre del cliente es obligatorio.';
+    valido = false;
   }
 
-  // 2. Validar modelo del equipo
-  let modeloFinal = '';
-  if (modeloSeleccionado.value === 'Otro modelo' || marca.value === 'Otra') {
-    if (!otroModeloTexto.value || otroModeloTexto.value.trim() === '') {
-      errorModelo.value = 'Especifique el modelo. Los espacios vacíos no son válidos como información.';
-      correcto = false;
-    } else if (!tieneTextoAlfanumericoValido(otroModeloTexto.value)) {
-      errorModelo.value = 'El modelo debe contener letras o números (no solo espacios o signos).';
-      correcto = false;
-    } else {
-      modeloFinal = otroModeloTexto.value.trim();
-    }
-  } else {
-    if (!modeloSeleccionado.value || modeloSeleccionado.value.trim() === '') {
-      errorModelo.value = 'Debe seleccionar un modelo de la lista.';
-      correcto = false;
-    } else {
-      modeloFinal = modeloSeleccionado.value.trim();
-    }
+  if (modelo.value === 'Otro modelo' && !modeloPersonalizado.value.trim()) {
+    errorModelo.value = 'Por favor escribe el modelo exacto.';
+    valido = false;
   }
 
-  // 3. Validar fallas o tipos de reparación seleccionados
-  if (!tiposReparacionSeleccionados.value || tiposReparacionSeleccionados.value.length === 0) {
-    errorReparacion.value = 'Debe marcar al menos una falla o reparación.';
-    correcto = false;
+  if (tiposReparacion.value.length === 0) {
+    errorReparacion.value = 'Debes seleccionar al menos una reparación o falla.';
+    valido = false;
   }
 
-  // 4. Validar campo 'Otro' si fue marcado
-  if (tieneOtroSeleccionado()) {
-    if (!otroTipoReparacion.value || otroTipoReparacion.value.trim() === '') {
-      errorOtro.value = 'Especifique la reparación. Los espacios vacíos no son válidos.';
-      correcto = false;
-    } else if (!tieneLetrasValidas(otroTipoReparacion.value)) {
-      errorOtro.value = 'La descripción de la falla debe contener letras válidas.';
-      correcto = false;
-    }
+  if (tiposReparacion.value.includes('Otro') && !otroTipoReparacion.value.trim()) {
+    errorReparacion.value = 'Por favor especifica el motivo en "Otro".';
+    valido = false;
   }
 
-  // 5. Validar precio
-  if (!precio.value || precio.value <= 0) {
-    errorPrecio.value = 'Ingrese un precio válido mayor a 0.';
-    correcto = false;
+  if (precio.value === null || precio.value < 0) {
+    errorPrecio.value = 'Ingresa un precio válido mayor o igual a 0.';
+    valido = false;
   }
 
-  // 6. Validar abono si aplica
   if (estadoPago.value === 'Abono') {
-    if (!valorAbono.value || valorAbono.value <= 0) {
-      errorAbono.value = 'Debe ingresar el valor del abono (mayor a 0).';
-      correcto = false;
-    } else if (precio.value && valorAbono.value > precio.value) {
-      errorAbono.value = 'El abono no puede ser mayor que el precio total.';
-      correcto = false;
+    if (valorAbono.value === null || valorAbono.value <= 0) {
+      errorAbono.value = 'Debes ingresar el valor abonado.';
+      valido = false;
+    } else if (precio.value !== null && valorAbono.value > precio.value) {
+      errorAbono.value = 'El abono no puede superar el precio total.';
+      valido = false;
     }
   }
 
-  // 7. Validar entrega y saldo pendiente:
-  // Si debe algún dinero en el equipo no debe dejar entregar el dispositivo
-  const saldoPendiente = saldoPendienteFormulario();
-  if (estadoEquipo.value === 'Entregado' && saldoPendiente > 0) {
-    errorEstadoEquipo.value = ` No se puede marcar como Entregado: el cliente tiene un saldo pendiente de ${formatoPesos(saldoPendiente)}. No se permite entregar equipos con deuda.`;
-    correcto = false;
+  if (estadoEquipo.value === 'Entregado') {
+    const p = precio.value || 0;
+    const a = estadoPago.value === 'Pagado' ? p : (valorAbono.value || 0);
+    if (estadoPago.value !== 'Pagado' || a < p) {
+      errorEstadoEquipo.value = 'No se puede poner "Entregado" si hay saldo pendiente de cobro.';
+      valido = false;
+    }
   }
 
-  if (!correcto) return;
+  return valido;
+}
 
-  const precioNum = Number(precio.value);
-  let abonoNum = 0;
+function guardarServicio() {
+  if (!validarFormulario()) return;
+
+  const modeloFinal = modelo.value === 'Otro modelo' ? modeloPersonalizado.value.trim() : modelo.value;
+  const precioFinal = precio.value || 0;
+  let abonoFinal = 0;
+
   if (estadoPago.value === 'Pagado') {
-    abonoNum = precioNum;
+    abonoFinal = precioFinal;
   } else if (estadoPago.value === 'Abono') {
-    abonoNum = Number(valorAbono.value);
-  }
-
-  const fallasArray = [...tiposReparacionSeleccionados.value];
-  const otroTexto = tieneOtroSeleccionado() ? otroTipoReparacion.value.trim() : '';
-
-  // Limpieza de observaciones para no almacenar espacios vacíos como información
-  let obsFinal = '';
-  if (observaciones.value && observaciones.value.trim() !== '') {
-    if (tieneTextoAlfanumericoValido(observaciones.value)) {
-      obsFinal = observaciones.value.trim();
-    }
+    abonoFinal = valorAbono.value || 0;
+  } else {
+    abonoFinal = 0;
   }
 
   if (esEdicion.value) {
-    const idx = servicios.value.findIndex((s) => s.id === idEditando.value);
+    const idx = servicios.value.findIndex(s => s.id === idEditando.value);
     if (idx !== -1) {
-      servicios.value[idx].cliente = cliente.value.trim();
-      servicios.value[idx].marca = marca.value;
-      servicios.value[idx].modelo = modeloFinal;
-      servicios.value[idx].tiposReparacion = fallasArray;
-      servicios.value[idx].otroTipoReparacion = otroTexto;
-      servicios.value[idx].tecnico = tecnico.value;
-      servicios.value[idx].precio = precioNum;
-      servicios.value[idx].metodoPago = metodoPago.value;
-      servicios.value[idx].estadoPago = estadoPago.value;
-      servicios.value[idx].valorAbono = abonoNum;
-      servicios.value[idx].estadoEquipo = estadoEquipo.value;
-      servicios.value[idx].observaciones = obsFinal;
-
-      mostrarMensaje('Servicio ' + idEditando.value + ' actualizado correctamente.');
+      const prev = servicios.value[idx];
+      servicios.value[idx] = {
+        ...prev,
+        cliente: cliente.value.trim(),
+        marca: marca.value,
+        modelo: modeloFinal,
+        tiposReparacion: [...tiposReparacion.value],
+        otroTipoReparacion: tiposReparacion.value.includes('Otro') ? otroTipoReparacion.value.trim() : undefined,
+        tecnico: tecnico.value,
+        precio: precioFinal,
+        metodoPago: metodoPago.value,
+        estadoPago: estadoPago.value,
+        valorAbono: abonoFinal,
+        estadoEquipo: estadoEquipo.value,
+        observaciones: observaciones.value.trim(),
+        fechaEntrega: estadoEquipo.value === 'Entregado' ? (prev.fechaEntrega || obtenerFechaActual()) : undefined
+      };
+      mostrarAlerta(`Servicio ${idEditando.value} actualizado exitosamente.`);
     }
   } else {
     const nuevoId = 'SRV-' + (100 + servicios.value.length + 1);
-    servicios.value.unshift({
+    const nuevoServicio: ServicioTecnico = {
       id: nuevoId,
       cliente: cliente.value.trim(),
       marca: marca.value,
       modelo: modeloFinal,
-      tiposReparacion: fallasArray,
-      otroTipoReparacion: otroTexto,
+      tiposReparacion: [...tiposReparacion.value],
+      otroTipoReparacion: tiposReparacion.value.includes('Otro') ? otroTipoReparacion.value.trim() : undefined,
       tecnico: tecnico.value,
-      fechaRecepcion: fechaRecepcion.value,
-      precio: precioNum,
+      fechaRecepcion: fechaRecepcion.value || obtenerFechaActual(),
+      precio: precioFinal,
       metodoPago: metodoPago.value,
       estadoPago: estadoPago.value,
-      valorAbono: abonoNum,
+      valorAbono: abonoFinal,
       estadoEquipo: estadoEquipo.value,
       calificacion: 0,
-      observaciones: obsFinal
-    });
-
-    mostrarMensaje('Nuevo servicio registrado con código ' + nuevoId + '.');
+      observaciones: observaciones.value.trim(),
+      fechaEntrega: estadoEquipo.value === 'Entregado' ? obtenerFechaActual() : undefined
+    };
+    servicios.value.unshift(nuevoServicio);
+    mostrarAlerta(`Servicio ${nuevoId} creado exitosamente.`);
   }
 
-  mostrarFormulario.value = false;
+  cerrarFormulario();
 }
 
-// Avanzar estados
-function pasarAEnReparacion(item: ServicioTecnico) {
-  const idx = servicios.value.findIndex((s) => s.id === item.id);
-  if (idx !== -1) {
-    servicios.value[idx].estadoEquipo = 'En reparación';
-    mostrarMensaje('Servicio ' + item.id + ' en reparación.');
-  }
+// Flujo de estados
+function cambiarEstadoDirecto(item: ServicioTecnico, nuevoEstado: 'En reparación' | 'Listo para entregar') {
+  item.estadoEquipo = nuevoEstado;
+  mostrarAlerta(`Equipo ${item.id} pasó a "${nuevoEstado}".`);
 }
 
-function pasarAListo(item: ServicioTecnico) {
-  const idx = servicios.value.findIndex((s) => s.id === item.id);
-  if (idx !== -1) {
-    servicios.value[idx].estadoEquipo = 'Listo para entregar';
-    mostrarMensaje('Servicio ' + item.id + ' listo para entregar.');
-  }
+function iniciarEntrega(item: ServicioTecnico) {
+  servicioParaEntregar.value = item;
+  calificacionSeleccionada.value = 5;
+  hoverEstrellas.value = 0;
+  mostrarModalEntrega.value = true;
 }
 
-// Modal para entregar y calificar: SE RESTRINGE SI TIENE DEUDA PENDIENTE
-function abrirEntregar(item: ServicioTecnico) {
-  const deuda = calcularPendiente(item);
-  if (deuda > 0) {
-    mostrarMensaje(` Entrega no permitida: El cliente ${item.cliente} tiene un saldo pendiente de ${formatoPesos(deuda)}. ¡No se puede entregar el dispositivo si debe dinero!`);
-    return;
-  }
-  servicioAEntregar.value = item;
-  estrellasCalificacion.value = 5;
-  modalEntregar.value = true;
+function cerrarModalEntrega() {
+  mostrarModalEntrega.value = false;
+  servicioParaEntregar.value = null;
 }
 
-// Función para registrar el cobro y saldar la deuda rápidamente
-function saldarCuenta(item: ServicioTecnico) {
-  const deuda = calcularPendiente(item);
-  const idx = servicios.value.findIndex((s) => s.id === item.id);
-  if (idx !== -1) {
-    servicios.value[idx].estadoPago = 'Pagado';
-    servicios.value[idx].valorAbono = servicios.value[idx].precio;
-    mostrarMensaje(`Pago de ${formatoPesos(deuda)} registrado para el servicio ${item.id}. ¡La deuda quedó cancelada y ya puede ser entregado!`);
-  }
+function saldarSaldoYEntregar() {
+  if (!servicioParaEntregar.value) return;
+  servicioParaEntregar.value.estadoPago = 'Pagado';
+  servicioParaEntregar.value.valorAbono = servicioParaEntregar.value.precio;
+  mostrarAlerta(`Pago saldado en su totalidad para ${servicioParaEntregar.value.id}.`);
 }
 
-// Saldar deuda directamente dentro del modal
-function saldarEnModal() {
-  if (servicioAEntregar.value) {
-    const deuda = calcularPendiente(servicioAEntregar.value);
-    const idx = servicios.value.findIndex((s) => s.id === servicioAEntregar.value?.id);
-    if (idx !== -1) {
-      servicios.value[idx].estadoPago = 'Pagado';
-      servicios.value[idx].valorAbono = servicios.value[idx].precio;
-      servicioAEntregar.value = { ...servicios.value[idx] };
-      mostrarMensaje(`Pago de ${formatoPesos(deuda)} recibido con éxito. Ahora puede confirmar la entrega.`);
-    }
-  }
+function saldarServicio(item: ServicioTecnico) {
+  item.estadoPago = 'Pagado';
+  item.valorAbono = item.precio;
+  mostrarAlerta(`Servicio ${item.id} registrado como Pagado.`);
 }
 
 function confirmarEntrega() {
-  if (servicioAEntregar.value) {
-    const deuda = calcularPendiente(servicioAEntregar.value);
-    if (deuda > 0) {
-      mostrarMensaje(` Entrega bloqueada: El equipo presenta un saldo pendiente de ${formatoPesos(deuda)}. No se puede entregar el dispositivo si debe dinero.`);
-      return;
-    }
-    const idx = servicios.value.findIndex((s) => s.id === servicioAEntregar.value?.id);
-    if (idx !== -1) {
-      servicios.value[idx].estadoEquipo = 'Entregado';
-      servicios.value[idx].calificacion = estrellasCalificacion.value;
-      servicios.value[idx].fechaEntrega = obtenerFechaActual();
-      servicios.value[idx].estadoPago = 'Pagado';
-      servicios.value[idx].valorAbono = servicios.value[idx].precio;
-      mostrarMensaje('Equipo entregado con éxito. Calificación: ' + estrellasCalificacion.value + '/5 estrellas.');
-    }
-    modalEntregar.value = false;
-    servicioAEntregar.value = null;
-  }
-}
-
-// Modal para eliminar
-function pedirEliminar(item: ServicioTecnico) {
-  if (item.estadoEquipo === 'Entregado') {
-    mostrarMensaje('No se puede eliminar un servicio ya entregado.');
+  if (!servicioParaEntregar.value) return;
+  if (servicioParaEntregar.value.estadoPago !== 'Pagado') {
     return;
   }
-  servicioAEliminar.value = item;
-  modalEliminar.value = true;
+  servicioParaEntregar.value.estadoEquipo = 'Entregado';
+  servicioParaEntregar.value.calificacion = calificacionSeleccionada.value;
+  servicioParaEntregar.value.fechaEntrega = obtenerFechaActual();
+  mostrarAlerta(`¡Equipo ${servicioParaEntregar.value.id} entregado a ${servicioParaEntregar.value.cliente}! Calificación: ${calificacionSeleccionada.value} estrellas.`);
+  cerrarModalEntrega();
 }
 
-function confirmarEliminar() {
-  if (servicioAEliminar.value) {
-    const id = servicioAEliminar.value.id;
-    servicios.value = servicios.value.filter((s) => s.id !== id);
-    mostrarMensaje('Servicio ' + id + ' eliminado.');
-    modalEliminar.value = false;
-    servicioAEliminar.value = null;
-  }
+function confirmarEliminar(id: string) {
+  idParaEliminar.value = id;
+  mostrarModalEliminar.value = true;
+}
+
+function ejecutarEliminar() {
+  servicios.value = servicios.value.filter(s => s.id !== idParaEliminar.value);
+  mostrarModalEliminar.value = false;
+  mostrarAlerta(`Servicio ${idParaEliminar.value} eliminado del registro.`);
+}
+
+function mostrarAlerta(msg: string) {
+  mensajeNotificacion.value = msg;
+  setTimeout(() => {
+    if (mensajeNotificacion.value === msg) {
+      mensajeNotificacion.value = '';
+    }
+  }, 4500);
 }
 </script>
 
 <template>
   <div class="contenedor-app">
     <div class="max-ancho">
-
-      <!-- ENCABEZADO -->
+      <!-- Encabezado principal -->
       <header class="barra-encabezado">
         <div>
-          <h1 class="titulo-app">Taller Don Efraín</h1>
-          <p class="subtitulo-app">Control de servicios técnicos y reparaciones</p>
+          <h1 class="titulo-app">Servicio Técnico - Don Efraín</h1>
+          <p class="subtitulo-app">Control de recepciones, reparaciones, cobros y entregas</p>
         </div>
-
-        <button
-          type="button"
-          @click="abrirCrear"
-          class="btn-nuevo-servicio"
-        >
-          + Nuevo servicio
-        </button>
+        <div>
+          <button @click="abrirModalNuevo" class="btn-nuevo-servicio">
+            + Nuevo Servicio Técnico
+          </button>
+        </div>
       </header>
 
-      <!-- AVISO DE NOTIFICACIÓN TEMPORAL -->
-      <div v-if="mensajeAviso" class="alerta-notificacion">
-        <span>{{ mensajeAviso }}</span>
-        <button type="button" @click="mensajeAviso = ''" class="btn-cerrar-alerta">✕</button>
+      <!-- Notificación temporal -->
+      <div v-if="mensajeNotificacion" class="alerta-notificacion">
+        <span>{{ mensajeNotificacion }}</span>
+        <button @click="mensajeNotificacion = ''" class="btn-cerrar-alerta">✕</button>
       </div>
 
-      <!-- BUSCADOR -->
-      <div class="barra-busqueda">
-        <input
-          type="text"
-          v-model="busqueda"
-          placeholder="Buscar por cliente, marca o modelo..."
-          class="input-buscador"
-        />
-        <div class="conteo-registros">
-          Total: <strong>{{ listaFiltrada().length }}</strong> registros
-        </div>
-      </div>
-
-      <!-- LISTA DE SERVICIOS: 3 TARJETAS ALINEADAS HORIZONTALMENTE -->
-      <div v-if="listaFiltrada().length === 0" class="sin-registros">
-        No se encontraron servicios técnicos registrados.
-      </div>
-
-      <div v-else class="grid-tarjetas-3">
+      <!-- Panel de conteo de aparatos por estado -->
+      <section class="panel-resumen-estados">
         <div
-          v-for="item in listaFiltrada()"
-          :key="item.id"
-          class="tarjeta-servicio"
+          class="tarjeta-conteo color-recibido"
+          :class="{ 'tarjeta-activa': filtroEstadoSeleccionado === 'Recibido' }"
+          @click="filtrarPorEstado('Recibido')"
         >
-          <!-- Contenido superior de la tarjeta -->
-          <div class="tarjeta-cuerpo">
-            <div class="tarjeta-cabecera">
-              <div>
-                <span class="id-servicio">{{ item.id }}</span>
-                <h3 class="nombre-cliente">{{ item.cliente }}</h3>
-                <p class="datos-equipo">{{ item.marca }} {{ item.modelo }}</p>
-              </div>
-
-              <!-- Badge estado del equipo -->
-              <span
-                class="badge-estado"
-                :class="{
-                  'estado-recibido': item.estadoEquipo === 'Recibido',
-                  'estado-reparacion': item.estadoEquipo === 'En reparación',
-                  'estado-listo': item.estadoEquipo === 'Listo para entregar',
-                  'estado-entregado': item.estadoEquipo === 'Entregado'
-                }"
-              >
-                {{ item.estadoEquipo }}
-              </span>
-            </div>
-
-            <!-- Detalles del servicio -->
-            <div class="detalles-servicio">
-              <!-- Fallas / tipos de reparación (etiquetas independientes separadas) -->
-              <div class="seccion-fallas">
-                <span class="etiqueta-gris">Fallas / Reparación:</span>
-                <div class="contenedor-tags">
-                  <span
-                    v-for="falla in obtenerFallas(item)"
-                    :key="falla"
-                    class="tag-reparacion"
-                  >
-                    {{ falla }}
-                  </span>
-                </div>
-              </div>
-
-              <p><span class="etiqueta-gris">Técnico:</span> {{ item.tecnico }}</p>
-              <p><span class="etiqueta-gris">Recepción:</span> {{ item.fechaRecepcion }}</p>
-              <p v-if="item.fechaEntrega"><span class="etiqueta-gris">Entrega:</span> {{ item.fechaEntrega }}</p>
-
-              <div class="precio-renglon">
-                <span class="etiqueta-gris">Precio:</span>
-                <strong>{{ formatoPesos(item.precio) }}</strong>
-                <span class="estado-pago-txt" :class="item.estadoPago === 'Pagado' ? 'txt-verde' : 'txt-naranja'">
-                  ({{ item.estadoPago }})
-                </span>
-              </div>
-
-              <!-- Abono y saldo si aplica -->
-              <div v-if="item.estadoPago === 'Abono'" class="caja-abono">
-                <p>Abonó: <strong>{{ formatoPesos(item.valorAbono) }}</strong></p>
-                <p class="txt-saldo">
-                  Saldo pendiente: <strong>{{ formatoPesos(calcularPendiente(item)) }}</strong>
-                  <span v-if="calcularPendiente(item) > 0" class="alerta-no-entrega"> (No entregar si debe)</span>
-                </p>
-              </div>
-              <div v-else-if="item.estadoPago === 'Pendiente'" class="caja-pendiente">
-                Debe el total: <strong>{{ formatoPesos(item.precio) }}</strong>
-                <span class="alerta-no-entrega"> (No entregar si debe)</span>
-              </div>
-
-              <p v-if="item.observaciones" class="obs-texto">
-                Obs: {{ item.observaciones }}
-              </p>
-            </div>
-
-            <!-- Calificación con estrellas visibles si ya fue entregado -->
-            <div v-if="item.estadoEquipo === 'Entregado'" class="calificacion-resultado">
-              <span class="etiqueta-gris">Calificación:</span>
-              <span class="estrellas-doradas">
-                <span v-for="s in 5" :key="s">{{ s <= item.calificacion ? '★' : '☆' }}</span>
-                <strong class="texto-calif">({{ item.calificacion }}/5)</strong>
-              </span>
-            </div>
-          </div>
-
-          <!-- Acciones al pie de la tarjeta -->
-          <div class="tarjeta-pie">
-            <!-- Si ya está entregado no permite modificaciones -->
-            <div v-if="item.estadoEquipo === 'Entregado'" class="bloque-entregado">
-              Entregado (No editable)
-            </div>
-
-            <!-- Botones de flujo y acción si está activo -->
-            <div v-else class="acciones-contenedor">
-              <div class="botones-flujo">
-                <button
-                  v-if="item.estadoEquipo === 'Recibido'"
-                  type="button"
-                  @click="pasarAEnReparacion(item)"
-                  class="btn-flujo btn-flujo-reparar"
-                >
-                  Reparar
-                </button>
-
-                <button
-                  v-if="item.estadoEquipo === 'En reparación' || item.estadoEquipo === 'Recibido'"
-                  type="button"
-                  @click="pasarAListo(item)"
-                  class="btn-flujo btn-flujo-listo"
-                >
-                  Marcar listo
-                </button>
-
-                <!-- Botón de entrega: si debe dinero no se permite entregar y se muestra advertencia -->
-                <button
-                  v-if="calcularPendiente(item) > 0"
-                  type="button"
-                  @click="abrirEntregar(item)"
-                  class="btn-flujo btn-flujo-bloqueado"
-                  :title="'Entrega bloqueada: debe ' + formatoPesos(calcularPendiente(item)) + '. No se puede entregar si debe dinero.'"
-                >
-                   Debe {{ formatoPesos(calcularPendiente(item)) }}
-                </button>
-
-                <button
-                  v-else
-                  type="button"
-                  @click="abrirEntregar(item)"
-                  class="btn-flujo btn-flujo-entregar"
-                  title="Entregar equipo al cliente"
-                >
-                  Entregar
-                </button>
-              </div>
-
-              <div class="botones-secundarios">
-                <button
-                  v-if="calcularPendiente(item) > 0"
-                  type="button"
-                  @click="saldarCuenta(item)"
-                  class="btn-link btn-saldar"
-                  title="Registrar pago completo del saldo pendiente"
-                >
-                   Pagar saldo
-                </button>
-                <button
-                  type="button"
-                  @click="abrirEditar(item)"
-                  class="btn-link btn-editar"
-                >
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  @click="pedirEliminar(item)"
-                  class="btn-link btn-eliminar"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
+          <span class="conteo-etiqueta">Recibidos</span>
+          <span class="conteo-valor">{{ conteosPorEstado.recibidos }}</span>
+          <span class="conteo-subtexto">Esperando revisión</span>
         </div>
-      </div>
 
-    </div>
+        <div
+          class="tarjeta-conteo color-reparacion"
+          :class="{ 'tarjeta-activa': filtroEstadoSeleccionado === 'En reparación' }"
+          @click="filtrarPorEstado('En reparación')"
+        >
+          <span class="conteo-etiqueta">En Reparación</span>
+          <span class="conteo-valor">{{ conteosPorEstado.enReparacion }}</span>
+          <span class="conteo-subtexto">En mesa de trabajo</span>
+        </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: REGISTRAR O EDITAR SERVICIO (TOTALMENTE VISIBLE Y CENTRADO)      -->
-    <!-- ========================================================================= -->
-    <div
-      v-if="mostrarFormulario"
-      class="modal-overlay-fijo"
-      style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 12px; box-sizing: border-box;"
-    >
-      <div
-        class="modal-caja-grande"
-        style="background: #ffffff; border-radius: 8px; width: 100%; max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid #cbd5e1;"
-      >
-        <!-- Encabezado del modal con botón X para salir -->
-        <div class="modal-cabecera">
-          <h2 class="modal-titulo">
-            {{ esEdicion ? 'Editar servicio (' + idEditando + ')' : 'Registrar nuevo servicio' }}
-          </h2>
+        <div
+          class="tarjeta-conteo color-listo"
+          :class="{ 'tarjeta-activa': filtroEstadoSeleccionado === 'Listo para entregar' }"
+          @click="filtrarPorEstado('Listo para entregar')"
+        >
+          <span class="conteo-etiqueta">Listos para Entrega</span>
+          <span class="conteo-valor">{{ conteosPorEstado.listos }}</span>
+          <span class="conteo-subtexto">Listos para cliente</span>
+        </div>
+
+        <div
+          class="tarjeta-conteo color-entregado"
+          :class="{ 'tarjeta-activa': filtroEstadoSeleccionado === 'Entregado' }"
+          @click="filtrarPorEstado('Entregado')"
+        >
+          <span class="conteo-etiqueta">Entregados</span>
+          <span class="conteo-valor">{{ conteosPorEstado.entregados }}</span>
+          <span class="conteo-subtexto">Historial finalizado</span>
+        </div>
+      </section>
+
+      <!-- Barra de filtros y búsqueda -->
+      <div class="barra-filtros">
+        <div class="grupo-buscador">
+          <input
+            type="text"
+            v-model="textoBusqueda"
+            placeholder="Buscar por cliente, marca, modelo, falla o ID..."
+            class="input-buscador"
+          />
+
+          <div class="filtro-select-contenedor">
+            <select v-model="filtroEstadoSeleccionado" class="select-filtro-estado">
+              <option value="">Todos los estados ({{ conteosPorEstado.total }})</option>
+              <option value="Recibido">Recibidos ({{ conteosPorEstado.recibidos }})</option>
+              <option value="En reparación">En reparación ({{ conteosPorEstado.enReparacion }})</option>
+              <option value="Listo para entregar">Listos para entregar ({{ conteosPorEstado.listos }})</option>
+              <option value="Entregado">Entregados ({{ conteosPorEstado.entregados }})</option>
+            </select>
+          </div>
+
           <button
-            type="button"
-            @click="cancelarFormulario"
-            class="modal-btn-x"
-            title="Cerrar y volver"
+            v-if="textoBusqueda || filtroEstadoSeleccionado"
+            @click="limpiarFiltros"
+            class="btn-limpiar-filtro"
           >
-            ✕
+            Limpiar filtros
           </button>
         </div>
 
-        <!-- Formulario scrolleable para que TODO sea visible -->
-        <form @submit.prevent="guardarServicio" class="modal-formulario-cuerpo">
-          <!-- Fila 1: Cliente, Marca, Modelo -->
-          <div class="form-grid-3">
-            <div class="form-grupo">
-              <label class="form-label">Nombre del cliente *</label>
-              <input
-                type="text"
-                v-model="cliente"
-                @input="validarClienteEnVivo"
-                placeholder="Nombre del cliente (requiere letras)"
-                class="form-input"
-              />
-              <p v-if="errorCliente" class="form-error">{{ errorCliente }}</p>
+        <div class="conteo-registros">
+          Mostrando {{ serviciosFiltrados.length }} de {{ servicios.length }} servicios
+        </div>
+      </div>
+
+      <!-- Listado de tarjetas de servicios -->
+      <main>
+        <div v-if="serviciosFiltrados.length === 0" class="sin-registros">
+          <p class="sin-registros-titulo">No se encontraron servicios técnicos</p>
+          <p class="sin-registros-sub">Prueba ajustando el buscador o crea una nueva recepción.</p>
+        </div>
+
+        <div v-else class="grilla-servicios">
+          <article
+            v-for="item in serviciosFiltrados"
+            :key="item.id"
+            class="tarjeta-servicio"
+            :class="{
+              'borde-recibido': item.estadoEquipo === 'Recibido',
+              'borde-reparacion': item.estadoEquipo === 'En reparación',
+              'borde-listo': item.estadoEquipo === 'Listo para entregar',
+              'borde-entregado': item.estadoEquipo === 'Entregado'
+            }"
+          >
+            <div>
+              <div class="tarjeta-cabecera">
+                <div>
+                  <span class="id-servicio">{{ item.id }}</span>
+                  <h2 class="nombre-cliente">{{ item.cliente }}</h2>
+                  <p class="datos-equipo">{{ item.marca }} {{ item.modelo }}</p>
+                </div>
+
+                <span
+                  class="badge-estado"
+                  :class="{
+                    'badge-recibido': item.estadoEquipo === 'Recibido',
+                    'badge-reparacion': item.estadoEquipo === 'En reparación',
+                    'badge-listo': item.estadoEquipo === 'Listo para entregar',
+                    'badge-entregado': item.estadoEquipo === 'Entregado'
+                  }"
+                >
+                  {{ item.estadoEquipo }}
+                </span>
+              </div>
+
+              <!-- Detalles del servicio -->
+              <div class="detalles-servicio">
+                <div>
+                  <strong>Reparaciones / Fallas:</strong>
+                  <div class="contenedor-tags-reparacion">
+                    <span
+                      v-for="(tipo, idx) in item.tiposReparacion || [item.tipoReparacion || 'General']"
+                      :key="idx"
+                      class="tag-reparacion"
+                    >
+                      {{ tipo === 'Otro' && item.otroTipoReparacion ? item.otroTipoReparacion : tipo }}
+                    </span>
+                  </div>
+                </div>
+
+                <p><strong>Técnico:</strong> {{ item.tecnico }}</p>
+                <p><strong>Recibido:</strong> {{ item.fechaRecepcion }}</p>
+                <p v-if="item.fechaEntrega"><strong>Entregado el:</strong> {{ item.fechaEntrega }}</p>
+
+                <!-- Precios y abonos -->
+                <p class="linea-financiera">
+                  <strong>Precio:</strong> {{ formatoPesos(item.precio) }} |
+                  <span
+                    class="estado-pago-txt"
+                    :class="{
+                      'txt-verde': item.estadoPago === 'Pagado',
+                      'txt-rojo': item.estadoPago === 'Pendiente',
+                      'txt-ambar': item.estadoPago === 'Abono'
+                    }"
+                  >
+                    {{ item.estadoPago }} ({{ item.metodoPago }})
+                  </span>
+                </p>
+
+                <div v-if="item.estadoPago === 'Abono'" class="caja-abono">
+                  <span>Abonó: <strong>{{ formatoPesos(item.valorAbono) }}</strong></span> |
+                  <span>Resta: <strong class="txt-rojo">{{ formatoPesos(calcularPendiente(item)) }}</strong></span>
+                </div>
+
+                <div v-else-if="item.estadoPago === 'Pendiente'" class="caja-abono">
+                  <span>Pendiente cobrar: <strong class="txt-rojo">{{ formatoPesos(item.precio) }}</strong></span>
+                </div>
+
+                <div v-if="item.observaciones" class="caja-observaciones">
+                  "{{ item.observaciones }}"
+                </div>
+
+                <div v-if="item.estadoEquipo === 'Entregado' && item.calificacion > 0" class="calificacion-resultado">
+                  <strong>Satisfacción:</strong>
+                  <span class="estrellas-doradas">
+                    {{ '★'.repeat(item.calificacion) }}{{ '☆'.repeat(5 - item.calificacion) }}
+                  </span>
+                  <span class="texto-puntuacion">({{ item.calificacion }}/5)</span>
+                </div>
+              </div>
             </div>
 
+            <!-- Acciones y avance de flujo -->
+            <div class="tarjeta-pie">
+              <div v-if="item.estadoEquipo === 'Recibido'" class="acciones-flujo-estado">
+                <button
+                  @click="cambiarEstadoDirecto(item, 'En reparación')"
+                  class="btn-flujo btn-a-reparar"
+                >
+                  ▶ Poner en reparación
+                </button>
+              </div>
+
+              <div v-else-if="item.estadoEquipo === 'En reparación'" class="acciones-flujo-estado">
+                <button
+                  @click="cambiarEstadoDirecto(item, 'Listo para entregar')"
+                  class="btn-flujo btn-a-listo"
+                >
+                  ✓ Marcar Listo
+                </button>
+              </div>
+
+              <div v-else-if="item.estadoEquipo === 'Listo para entregar'">
+                <div v-if="item.estadoPago === 'Pagado'" class="acciones-flujo-estado">
+                  <button
+                    @click="iniciarEntrega(item)"
+                    class="btn-flujo btn-a-entregar"
+                  >
+                    ★ Entregar al cliente
+                  </button>
+                </div>
+                <div v-else class="contenedor-alerta-entrega">
+                  <span class="alerta-no-entrega">
+                    Pendiente: {{ formatoPesos(calcularPendiente(item)) }}
+                  </span>
+                  <button @click="saldarServicio(item)" class="btn-saldar">
+                    Cobrar saldo restante
+                  </button>
+                </div>
+              </div>
+
+              <div v-else-if="item.estadoEquipo === 'Entregado'" class="bloque-entregado">
+                ✓ Servicio completado
+              </div>
+
+              <!-- Botones de edición y borrado -->
+              <div class="acciones-edicion">
+                <button @click="abrirModalEditar(item)" class="btn-link btn-editar">Editar</button>
+                <button @click="confirmarEliminar(item.id)" class="btn-link btn-eliminar">Eliminar</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modal de Registro y Edición -->
+    <div v-if="mostrarFormulario" class="modal-overlay" @click.self="cerrarFormulario">
+      <div class="modal-caja">
+        <div class="modal-cabecera">
+          <h2 class="modal-titulo">
+            {{ esEdicion ? 'Editar Servicio Técnico (' + idEditando + ')' : 'Nuevo Servicio Técnico' }}
+          </h2>
+          <button @click="cerrarFormulario" class="modal-btn-x">✕</button>
+        </div>
+
+        <div class="modal-cuerpo">
+          <!-- Nombre del cliente -->
+          <div class="form-grupo">
+            <label class="form-label">Nombre del cliente *</label>
+            <input
+              type="text"
+              v-model="cliente"
+              placeholder="Ej: Pedro Pérez"
+              class="form-input"
+            />
+            <p v-if="errorCliente" class="form-error">{{ errorCliente }}</p>
+          </div>
+
+          <!-- Marca y Modelo dinámico -->
+          <div class="form-grid-2">
             <div class="form-grupo">
-              <label class="form-label">Marca (Select) *</label>
+              <label class="form-label">Marca del equipo *</label>
               <select v-model="marca" @change="alCambiarMarca" class="form-select">
                 <option v-for="m in listaMarcas" :key="m" :value="m">{{ m }}</option>
               </select>
             </div>
 
             <div class="form-grupo">
-              <label class="form-label">Modelo del equipo (Select) *</label>
-              <select v-model="modeloSeleccionado" @change="alCambiarModelo" class="form-select">
-                <option v-for="mod in obtenerModelosDeMarca(marca)" :key="mod" :value="mod">{{ mod }}</option>
+              <label class="form-label">Modelo del equipo *</label>
+              <select v-model="modelo" class="form-select">
+                <option v-for="mod in obtenerModelosDeMarca(marca)" :key="mod" :value="mod">
+                  {{ mod }}
+                </option>
               </select>
-              <p v-if="errorModelo && modeloSeleccionado !== 'Otro modelo' && marca !== 'Otra'" class="form-error">{{ errorModelo }}</p>
-
-              <!-- Si selecciona 'Otro modelo' o la marca es 'Otra' -->
-              <div v-if="modeloSeleccionado === 'Otro modelo' || marca === 'Otra'" class="campo-otro-modelo">
-                <label class="form-label sub-label">Especifique el modelo: *</label>
-                <input
-                  type="text"
-                  v-model="otroModeloTexto"
-                  @input="validarModeloEnVivo"
-                  placeholder="Ej: Galaxy Note 10, iPad 9, ZTE Blade..."
-                  class="form-input"
-                />
-                <p v-if="errorModelo" class="form-error">{{ errorModelo }}</p>
-              </div>
             </div>
           </div>
 
-          <!-- Fila 2: SELECCIÓN MÚLTIPLE DE FALLAS O REPARACIONES -->
-          <div class="form-caja-fallas">
-            <label class="form-label-bold">
-              Fallas o tipos de reparación (puede seleccionar varias) *
-            </label>
-            <div class="grid-checkboxes-fallas">
+          <!-- Modelo personalizado si escoge 'Otro modelo' -->
+          <div v-if="modelo === 'Otro modelo'" class="form-grupo">
+            <label class="form-label">Escribe el modelo específico *</label>
+            <input
+              type="text"
+              v-model="modeloPersonalizado"
+              placeholder="Ej: Galaxy Note 9 / Moto G60"
+              class="form-input"
+            />
+            <p v-if="errorModelo" class="form-error">{{ errorModelo }}</p>
+          </div>
+
+          <!-- Tipos de reparación (Múltiples opciones) -->
+          <div class="grupo-reparaciones">
+            <label class="form-label-bold">Reparaciones / Fallas a realizar *</label>
+            <div class="checkbox-grid">
               <label
                 v-for="rep in listaReparaciones"
                 :key="rep"
@@ -1088,93 +908,90 @@ function confirmarEliminar() {
               >
                 <input
                   type="checkbox"
-                  :value="rep"
-                  v-model="tiposReparacionSeleccionados"
+                  :checked="tiposReparacion.includes(rep)"
+                  @change="toggleReparacion(rep)"
                 />
                 <span>{{ rep }}</span>
               </label>
             </div>
-            <p v-if="errorReparacion" class="form-error">{{ errorReparacion }}</p>
 
-            <!-- Campo 'Otro' -->
-            <div v-if="tieneOtroSeleccionado()" class="campo-otro-bloque">
-              <label class="form-label-bold">
-                Especifique cuál otra falla o trabajo: *
-              </label>
+            <div v-if="tiposReparacion.includes('Otro')" class="form-grupo" style="margin-top: 0.5rem;">
+              <label class="sub-label">Especifica la otra reparación *</label>
               <input
                 type="text"
                 v-model="otroTipoReparacion"
-                @input="validarOtroEnVivo"
-                placeholder="Ej: Sin audio, conector de carga sulfatado..."
+                placeholder="Ej: Cambio de lector SIM, baño químico..."
                 class="form-input"
               />
-              <p v-if="errorOtro" class="form-error">{{ errorOtro }}</p>
             </div>
+            <p v-if="errorReparacion" class="form-error">{{ errorReparacion }}</p>
           </div>
 
-          <!-- Fila 3: Técnico y Fecha automática -->
+          <!-- Técnico y fecha -->
           <div class="form-grid-2">
             <div class="form-grupo">
-              <label class="form-label">Técnico encargado *</label>
+              <label class="form-label">Técnico asignado *</label>
               <select v-model="tecnico" class="form-select">
                 <option v-for="t in listaTecnicos" :key="t" :value="t">{{ t }}</option>
               </select>
             </div>
 
             <div class="form-grupo">
-              <label class="form-label">Fecha de recepción (automática)</label>
+              <label class="form-label">Fecha de recepción</label>
               <input
                 type="text"
                 v-model="fechaRecepcion"
-                disabled
-                class="form-input input-deshabilitado"
+                class="form-input"
               />
             </div>
           </div>
 
-          <!-- Fila 4: Precio, Método de pago, Estado del pago -->
-          <div class="form-grid-3">
+          <!-- Precio total con puntos de miles en vivo -->
+          <div class="form-grid-2">
             <div class="form-grupo">
               <label class="form-label">Precio total ($) *</label>
               <input
-                type="number"
-                v-model.number="precio"
-                @input="validarEstadoEquipoEnVivo"
-                placeholder="Ej: 140000"
+                type="text"
+                inputmode="numeric"
+                :value="precioTexto"
+                @input="onInputPrecio"
+                placeholder="Ej: 140.000"
                 class="form-input"
               />
               <p v-if="errorPrecio" class="form-error">{{ errorPrecio }}</p>
             </div>
 
             <div class="form-grupo">
-              <label class="form-label">Método de pago</label>
+              <label class="form-label">Método de pago *</label>
               <select v-model="metodoPago" class="form-select">
                 <option value="Efectivo">Efectivo</option>
-                <option value="Transferencia">Transferencia</option>
-                <option value="Tarjeta">Tarjeta</option>
-              </select>
-            </div>
-
-            <div class="form-grupo">
-              <label class="form-label">Estado del pago *</label>
-              <select v-model="estadoPago" @change="validarEstadoEquipoEnVivo" class="form-select">
-                <option value="Pendiente">Pendiente</option>
-                <option value="Abono">Abono</option>
-                <option value="Pagado">Pagado</option>
+                <option value="Transferencia">Transferencia (Nequi / Bancolombia / Daviplata)</option>
+                <option value="Tarjeta">Tarjeta de Crédito / Débito</option>
               </select>
             </div>
           </div>
 
-          <!-- Abono condicional (solo si estadoPago === 'Abono') -->
+          <!-- Estado de pago -->
+          <div class="form-grupo">
+            <label class="form-label">Estado del pago *</label>
+            <select v-model="estadoPago" @change="alCambiarEstadoPago" class="form-select">
+              <option value="Pendiente">Pendiente (No ha pagado)</option>
+              <option value="Abono">Abono (Ha dejado un anticipo)</option>
+              <option value="Pagado">Pagado (Totalmente cancelado)</option>
+            </select>
+          </div>
+
+          <!-- Bloque condicional si escoge 'Abono' con puntos de miles en vivo -->
           <div v-if="estadoPago === 'Abono'" class="bloque-abono-condicional">
             <div class="form-grid-2">
               <div class="form-grupo">
                 <label class="form-label">Valor abonado ($) *</label>
                 <input
-                  type="number"
-                  v-model.number="valorAbono"
-                  @input="validarEstadoEquipoEnVivo"
-                  placeholder="Ej: 50000"
+                  type="text"
+                  inputmode="numeric"
+                  :value="valorAbonoTexto"
+                  @input="onInputAbono"
+                  placeholder="Ej: 50.000"
                   class="form-input"
                 />
                 <p v-if="errorAbono" class="form-error">{{ errorAbono }}</p>
@@ -1191,195 +1008,145 @@ function confirmarEliminar() {
             </div>
           </div>
 
-          <!-- Fila 5: Estado del equipo y Observaciones -->
-          <div class="form-grid-2">
-            <div class="form-grupo">
-              <label class="form-label">Estado del equipo</label>
-              <select v-model="estadoEquipo" @change="validarEstadoEquipoEnVivo" class="form-select">
-                <option value="Recibido">Recibido</option>
-                <option value="En reparación">En reparación</option>
-                <option value="Listo para entregar">Listo para entregar</option>
-                <option v-if="esEdicion" value="Entregado">Entregado</option>
-              </select>
-              <p v-if="errorEstadoEquipo" class="form-error">{{ errorEstadoEquipo }}</p>
+          <!-- Estado actual del equipo -->
+          <div class="form-grupo">
+            <label class="form-label">Estado actual del equipo *</label>
+            <select
+              v-model="estadoEquipo"
+              @change="validarEstadoEquipoEnVivo"
+              class="form-select"
+            >
+              <option value="Recibido">Recibido (Esperando revisión)</option>
+              <option value="En reparación">En reparación (En la mesa)</option>
+              <option value="Listo para entregar">Listo para entregar (Terminado)</option>
+              <option value="Entregado">Entregado (Cliente ya lo retiró)</option>
+            </select>
+            <p v-if="errorEstadoEquipo" class="form-error">{{ errorEstadoEquipo }}</p>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="form-grupo">
+            <label class="form-label">Observaciones técnicas o del cliente</label>
+            <textarea
+              v-model="observaciones"
+              rows="2"
+              placeholder="Detalles de golpes, rayones, accesorios dejados..."
+              class="form-textarea"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-pie">
+          <button @click="cerrarFormulario" class="btn-secundario">Cancelar</button>
+          <button @click="guardarServicio" class="btn-primario">
+            {{ esEdicion ? 'Guardar Cambios' : 'Registrar Servicio' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Entrega con Calificación de 1 a 5 Estrellas -->
+    <div v-if="mostrarModalEntrega && servicioParaEntregar" class="modal-overlay" @click.self="cerrarModalEntrega">
+      <div class="modal-caja" style="max-width: 480px;">
+        <div class="modal-cuerpo">
+          <div class="entrega-cabecera">
+            <h2 class="entrega-titulo">Entrega al Cliente</h2>
+            <button @click="cerrarModalEntrega" class="modal-btn-x-simple">✕</button>
+          </div>
+
+          <div class="resumen-entrega-equipo">
+            <p class="cliente-nombre-destacado">{{ servicioParaEntregar.cliente }}</p>
+            <p class="equipo-datos-destacado">{{ servicioParaEntregar.marca }} {{ servicioParaEntregar.modelo }}</p>
+            <p class="id-destacado">Orden: {{ servicioParaEntregar.id }}</p>
+          </div>
+
+          <!-- Control de saldo antes de permitir entrega -->
+          <div v-if="servicioParaEntregar.estadoPago !== 'Pagado'" class="alerta-deuda-modal">
+            <p class="alerta-deuda-titulo">¡ATENCIÓN: TIENE SALDO PENDIENTE!</p>
+            <p class="alerta-deuda-desc">
+              Saldo pendiente:
+              <strong>{{ formatoPesos(calcularPendiente(servicioParaEntregar)) }}</strong>
+              <br />
+              Para entregar el equipo debe registrarse como Pagado.
+            </p>
+            <button @click="saldarSaldoYEntregar" class="btn-saldar-completo">
+              Cobrar y Marcar como Pagado Ahora
+            </button>
+          </div>
+
+          <div v-else class="nota-entrega-pagado">
+            ✓ Equipo completamente pagado. Listo para entregar.
+          </div>
+
+          <!-- Calificación de satisfacción -->
+          <div class="seccion-calificacion-estrellas">
+            <p class="label-calificacion">Calificación de satisfacción del cliente:</p>
+            <div class="fila-estrellas">
+              <button
+                v-for="num in 5"
+                :key="num"
+                type="button"
+                @mouseenter="hoverEstrellas = num"
+                @mouseleave="hoverEstrellas = 0"
+                @click="calificacionSeleccionada = num"
+                class="btn-estrella"
+                :class="{ 'estrella-activa': num <= (hoverEstrellas || calificacionSeleccionada) }"
+              >
+                ★
+              </button>
             </div>
-
-            <div class="form-grupo">
-              <label class="form-label">Observaciones (opcional)</label>
-              <input
-                type="text"
-                v-model="observaciones"
-                placeholder="Detalle físico, rayones, etc..."
-                class="form-input"
-              />
-            </div>
+            <p class="texto-estrellas-info">
+              {{ calificacionSeleccionada }} de 5 estrellas
+              <span v-if="calificacionSeleccionada === 5">(Excelente servicio)</span>
+              <span v-else-if="calificacionSeleccionada === 4">(Muy buen servicio)</span>
+              <span v-else-if="calificacionSeleccionada === 3">(Aceptable)</span>
+              <span v-else-if="calificacionSeleccionada === 2">(Regular)</span>
+              <span v-else>(Insatisfecho)</span>
+            </p>
           </div>
 
-          <!-- Botones fijos al pie del formulario -->
-          <div class="modal-pie-botones">
-            <button
-              type="button"
-              @click="cancelarFormulario"
-              class="btn-cancelar"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="btn-guardar"
-            >
-              {{ esEdicion ? 'Guardar cambios' : 'Guardar servicio' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: ENTREGAR EQUIPO Y CALIFICAR (CON ESTRELLAS 100% VISIBLES)        -->
-    <!-- ========================================================================= -->
-    <div
-      v-if="modalEntregar"
-      class="modal-overlay-fijo"
-      style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 16px; box-sizing: border-box;"
-    >
-      <div
-        class="modal-caja-entrega"
-        style="background: #ffffff; border-radius: 8px; width: 100%; max-width: 440px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid #cbd5e1; text-align: center; box-sizing: border-box;"
-      >
-        <div class="entrega-cabecera">
-          <h2 class="entrega-titulo">Entregar equipo</h2>
-          <button
-            type="button"
-            @click="modalEntregar = false; servicioAEntregar = null"
-            class="modal-btn-x-simple"
-            title="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div class="entrega-info-cliente">
-          <p class="cliente-nombre-destacado">{{ servicioAEntregar?.cliente }}</p>
-          <p class="cliente-dispositivo-destacado">{{ servicioAEntregar?.marca }} {{ servicioAEntregar?.modelo }}</p>
-          <p class="codigo-servicio-badge">{{ servicioAEntregar?.id }}</p>
-        </div>
-
-        <!-- SECCIÓN DE CALIFICACIÓN CON ESTRELLAS -->
-        <div class="seccion-calificacion-estrellas">
-          <p class="label-calificacion">Calificación del servicio:</p>
-          
-          <div class="fila-estrellas-interactivas">
-            <button
-              v-for="st in 5"
-              :key="st"
-              type="button"
-              @click="estrellasCalificacion = st"
-              class="boton-estrella"
-              :class="{ 'estrella-activa': st <= estrellasCalificacion }"
-              :title="'Calificar ' + st + ' de 5'"
-            >
-              ★
-            </button>
-          </div>
-
-          <p class="texto-estrellas-info">
-            <strong>{{ estrellasCalificacion }} de 5 estrellas</strong>
-            <span v-if="estrellasCalificacion === 5"> (Excelente)</span>
-            <span v-else-if="estrellasCalificacion === 4"> (Muy bueno)</span>
-            <span v-else-if="estrellasCalificacion === 3"> (Bueno)</span>
-            <span v-else-if="estrellasCalificacion === 2"> (Regular)</span>
-            <span v-else> (Malo)</span>
+          <p class="nota-entrega-informativa">
+            Al confirmar, el servicio pasará al estado final <strong>"Entregado"</strong> con fecha y hora actual.
           </p>
-        </div>
 
-        <!-- ESTADO DE LA CUENTA / AVISO DE SALDO PENDIENTE -->
-        <div v-if="servicioAEntregar && calcularPendiente(servicioAEntregar) > 0" class="alerta-deuda-modal">
-          <p class="alerta-deuda-titulo"> ENTREGA BLOQUEADA POR DEUDA</p>
-          <p class="alerta-deuda-desc">
-            El cliente adeuda <strong class="txt-rojo">{{ formatoPesos(calcularPendiente(servicioAEntregar)) }}</strong>.
-            No se permite entregar el dispositivo hasta que el saldo esté 100% pagado.
+          <div class="acciones-entrega-botones">
+            <button @click="cerrarModalEntrega" class="btn-secundario">Cancelar</button>
+            <button
+              @click="confirmarEntrega"
+              :disabled="servicioParaEntregar.estadoPago !== 'Pagado'"
+              class="btn-confirmar-entrega"
+            >
+              Confirmar Entrega
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div v-if="mostrarModalEliminar" class="modal-overlay" @click.self="mostrarModalEliminar = false">
+      <div class="modal-caja" style="max-width: 400px;">
+        <div class="modal-cuerpo">
+          <h2 class="eliminar-titulo">¿Eliminar registro?</h2>
+          <p class="eliminar-pregunta">
+            ¿Estás seguro de eliminar el servicio <strong>{{ idParaEliminar }}</strong>? Esta acción no se puede deshacer.
           </p>
-          <button
-            type="button"
-            @click="saldarEnModal"
-            class="btn-cobrar-ahora"
-          >
-             Registrar pago del saldo ({{ formatoPesos(calcularPendiente(servicioAEntregar)) }})
-          </button>
-        </div>
-
-        <div v-else class="nota-entrega-pagado">
-          <p>✓ <strong>Cuenta al día:</strong> El equipo está 100% pagado (sin deuda). Listo para confirmar la entrega.</p>
-        </div>
-
-        <div class="entrega-botones">
-          <button
-            type="button"
-            @click="modalEntregar = false; servicioAEntregar = null"
-            class="btn-cancelar"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            @click="confirmarEntrega"
-            :disabled="!servicioAEntregar || calcularPendiente(servicioAEntregar) > 0"
-            class="btn-confirmar-entrega"
-            :class="{ 'btn-deshabilitado': !servicioAEntregar || calcularPendiente(servicioAEntregar) > 0 }"
-            :title="calcularPendiente(servicioAEntregar) > 0 ? 'No se puede entregar: debe dinero' : 'Confirmar entrega'"
-          >
-            Confirmar entrega
-          </button>
+          <div class="eliminar-botones">
+            <button @click="mostrarModalEliminar = false" class="btn-secundario">Cancelar</button>
+            <button @click="ejecutarEliminar" class="btn-peligro">Sí, eliminar</button>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- ========================================================================= -->
-    <!-- MODAL 3: ELIMINAR SERVICIO                                                -->
-    <!-- ========================================================================= -->
-    <div
-      v-if="modalEliminar"
-      class="modal-overlay-fijo"
-      style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 16px; box-sizing: border-box;"
-    >
-      <div
-        class="modal-caja-eliminar"
-        style="background: #ffffff; border-radius: 8px; width: 100%; max-width: 380px; padding: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid #cbd5e1; text-align: center; box-sizing: border-box;"
-      >
-        <h3 class="eliminar-titulo">Confirmar eliminación</h3>
-        <p class="eliminar-pregunta">
-          ¿Desea eliminar el registro <strong>{{ servicioAEliminar?.id }}</strong> de <strong>{{ servicioAEliminar?.cliente }}</strong>?
-        </p>
-
-        <div class="eliminar-botones">
-          <button
-            type="button"
-            @click="modalEliminar = false; servicioAEliminar = null"
-            class="btn-cancelar"
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            @click="confirmarEliminar"
-            class="btn-confirmar-eliminar"
-          >
-            Eliminar
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
-<style scoped>
+<style>
 /* =============================================================================
-   ESTILOS ROBUSTOS PARA EL TALLER DON EFRAÍN
+   ESTILOS GENERALES Y ROBUSTOS - TALLER DON EFRAÍN
    ============================================================================= */
 
-/* Contenedor general */
+/* Contenedor principal de la aplicación */
 .contenedor-app {
   min-height: 100vh;
   background-color: #f1f5f9;
@@ -1397,7 +1164,7 @@ function confirmarEliminar() {
   gap: 1.25rem;
 }
 
-/* Barra de encabezado */
+/* Barra superior de encabezado */
 .barra-encabezado {
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
@@ -1418,41 +1185,42 @@ function confirmarEliminar() {
 
 .titulo-app {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #0f172a;
 }
 
 .subtitulo-app {
   margin: 0.2rem 0 0 0;
-  font-size: 0.8rem;
+  font-size: 0.925rem;
   color: #64748b;
 }
 
 .btn-nuevo-servicio {
   background-color: #2563eb;
   color: #ffffff;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.15rem;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color 0.15s ease;
 }
 
 .btn-nuevo-servicio:hover {
   background-color: #1d4ed8;
 }
 
-/* Alerta de notificación */
+/* Alerta informativa de acción */
 .alerta-notificacion {
   background-color: #ecfdf5;
   border: 1px solid #a7f3d0;
   color: #065f46;
-  padding: 0.65rem 1rem;
+  padding: 0.75rem 1.15rem;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1462,37 +1230,121 @@ function confirmarEliminar() {
   background: none;
   border: none;
   color: #065f46;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   padding: 0 0.5rem;
 }
 
-/* Barra de búsqueda */
-.barra-busqueda {
+/* Panel de resumen: conteo de aparatos por estado */
+.panel-resumen-estados {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .panel-resumen-estados {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.tarjeta-conteo {
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 0.75rem 1rem;
+  padding: 0.95rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.tarjeta-conteo:hover {
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.tarjeta-conteo.tarjeta-activa {
+  border-color: #2563eb;
+  background-color: #f8fafc;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.tarjeta-conteo.tarjeta-activa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #2563eb;
+}
+
+.conteo-etiqueta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #64748b;
+}
+
+.conteo-valor {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  margin: 0.2rem 0;
+}
+
+.conteo-subtexto {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* Indicadores de color para cada estado */
+.color-recibido .conteo-valor { color: #d97706; }
+.color-reparacion .conteo-valor { color: #2563eb; }
+.color-listo .conteo-valor { color: #059669; }
+.color-entregado .conteo-valor { color: #475569; }
+
+/* Barra de filtros y buscador */
+.barra-filtros {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.85rem 1.15rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
 @media (min-width: 640px) {
-  .barra-busqueda {
+  .barra-filtros {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
 }
 
+.grupo-buscador {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .input-buscador {
-  width: 100%;
+  flex: 1;
+  min-width: 200px;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.95rem;
   box-sizing: border-box;
 }
 
@@ -1501,38 +1353,93 @@ function confirmarEliminar() {
   border-color: #2563eb;
 }
 
+.filtro-select-contenedor {
+  min-width: 220px;
+}
+
+.select-filtro-estado {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: #1e293b;
+  background-color: #f8fafc;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.select-filtro-estado:focus {
+  outline: 2px solid #2563eb;
+  border-color: #2563eb;
+}
+
+.btn-limpiar-filtro {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.55rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-limpiar-filtro:hover {
+  background-color: #e2e8f0;
+}
+
 .conteo-registros {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #64748b;
   white-space: nowrap;
 }
 
-/* Sin registros */
+/* Grilla de servicios */
+.grilla-servicios {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .grilla-servicios {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grilla-servicios {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .sin-registros {
   background-color: #ffffff;
-  border: 1px solid #cbd5e1;
+  border: 1px dashed #cbd5e1;
   border-radius: 6px;
   padding: 2.5rem 1rem;
   text-align: center;
   color: #64748b;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
 }
 
-/* =============================================================================
-   CUADRÍCULA: 3 TARJETAS ALINEADAS HORIZONTALMENTE POR FILA
-   ============================================================================= */
-.grid-tarjetas-3 {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
+.sin-registros-titulo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.5rem 0;
 }
 
-@media (min-width: 768px) {
-  .grid-tarjetas-3 {
-    grid-template-columns: repeat(3, 1fr); /* Exactamente 3 tarjetas por fila */
-  }
+.sin-registros-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
 }
 
+/* Tarjeta individual de servicio */
 .tarjeta-servicio {
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
@@ -1541,283 +1448,265 @@ function confirmarEliminar() {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 0.75rem;
 }
 
-.tarjeta-cuerpo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+.tarjeta-servicio.borde-recibido {
+  border-top: 4px solid #f59e0b;
+}
+
+.tarjeta-servicio.borde-reparacion {
+  border-top: 4px solid #2563eb;
+}
+
+.tarjeta-servicio.borde-listo {
+  border-top: 4px solid #10b981;
+}
+
+.tarjeta-servicio.borde-entregado {
+  border-top: 4px solid #64748b;
+  opacity: 0.95;
 }
 
 .tarjeta-cabecera {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 
 .id-servicio {
   font-family: monospace;
-  font-size: 0.75rem;
+  font-size: 0.825rem;
   font-weight: 700;
   color: #64748b;
 }
 
 .nombre-cliente {
   margin: 0.15rem 0 0 0;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #0f172a;
 }
 
 .datos-equipo {
-  margin: 0.1rem 0 0 0;
-  font-size: 0.8rem;
+  margin: 0.15rem 0 0 0;
+  font-size: 0.925rem;
   font-weight: 600;
   color: #1e40af;
 }
 
-/* Badges de estado */
+/* Badges de estado del equipo */
 .badge-estado {
-  font-size: 0.7rem;
+  font-size: 0.775rem;
   font-weight: 700;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.55rem;
   border-radius: 4px;
   border: 1px solid #cbd5e1;
   white-space: nowrap;
 }
 
-.estado-recibido {
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
+.badge-recibido {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.badge-reparacion {
+  background-color: #dbeafe;
   color: #1e40af;
+  border-color: #bfdbfe;
 }
 
-.estado-reparacion {
-  background-color: #fefce8;
-  border-color: #fef08a;
-  color: #854d0e;
+.badge-listo {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
 }
 
-.estado-listo {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
-}
-
-.estado-entregado {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+.badge-entregado {
+  background-color: #f1f5f9;
   color: #475569;
+  border-color: #cbd5e1;
 }
 
-/* Detalles técnicos */
+/* Detalles del servicio técnico */
 .detalles-servicio {
-  font-size: 0.775rem;
+  font-size: 0.875rem;
   color: #334155;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .detalles-servicio p {
   margin: 0;
+  line-height: 1.35;
 }
 
-.etiqueta-gris {
-  color: #64748b;
-  font-weight: 500;
-}
-
-.seccion-fallas {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.contenedor-tags {
+.contenedor-tags-reparacion {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
 }
 
 .tag-reparacion {
   background-color: #f1f5f9;
   border: 1px solid #cbd5e1;
   color: #1e293b;
-  padding: 0.15rem 0.45rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 3px;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
-.precio-renglon {
+.linea-financiera {
   margin-top: 0.25rem;
+  font-size: 0.925rem;
 }
 
 .estado-pago-txt {
-  font-weight: 600;
-  margin-left: 0.35rem;
+  font-weight: 700;
 }
 
-.txt-verde {
-  color: #166534;
-}
-
-.txt-naranja {
-  color: #b45309;
-}
+.txt-verde { color: #16a34a; }
+.txt-rojo { color: #dc2626; }
+.txt-ambar { color: #d97706; }
 
 .caja-abono {
   background-color: #fefce8;
   border: 1px solid #fef08a;
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.65rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #713f12;
 }
 
-.caja-abono p {
-  margin: 0.15rem 0;
-}
-
-.txt-saldo {
-  color: #b91c1c;
-  font-weight: 700;
-}
-
-.caja-pendiente {
-  color: #b91c1c;
-  font-weight: 600;
-}
-
-.obs-texto {
-  color: #64748b;
+.caja-observaciones {
+  background-color: #f8fafc;
+  border-left: 2px solid #cbd5e1;
+  padding: 0.35rem 0.5rem;
   font-style: italic;
+  font-size: 0.825rem;
+  color: #475569;
 }
 
 .calificacion-resultado {
   border-top: 1px solid #e2e8f0;
-  padding-top: 0.4rem;
-  font-size: 0.775rem;
+  padding-top: 0.45rem;
+  font-size: 0.85rem;
 }
 
 .estrellas-doradas {
-  color: #d97706;
-  font-size: 0.95rem;
+  color: #eab308;
+  font-size: 1.05rem;
   margin-left: 0.25rem;
 }
 
-.texto-calif {
-  font-size: 0.75rem;
+.texto-puntuacion {
+  color: #64748b;
+  font-size: 0.825rem;
   margin-left: 0.25rem;
 }
 
-/* Pie de tarjeta y acciones */
+/* Pie de tarjeta con acciones y flujo de estados */
 .tarjeta-pie {
   border-top: 1px solid #e2e8f0;
-  padding-top: 0.65rem;
-  margin-top: 0.65rem;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
 }
 
 .bloque-entregado {
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #94a3b8;
   font-weight: 600;
   padding: 0.25rem 0;
 }
 
-.acciones-contenedor {
+.acciones-flujo-estado {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.botones-flujo {
-  display: flex;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .btn-flujo {
   flex: 1;
-  padding: 0.35rem 0.4rem;
-  font-size: 0.75rem;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
   border: 1px solid transparent;
   text-align: center;
+  transition: all 0.15s ease;
 }
 
-.btn-flujo-reparar {
-  background-color: #fef9c3;
-  color: #713f12;
-  border-color: #fde047;
+.btn-a-reparar {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+.btn-a-reparar:hover {
+  background-color: #dbeafe;
 }
 
-.btn-flujo-reparar:hover {
-  background-color: #fef08a;
+.btn-a-listo {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
 }
-
-.btn-flujo-listo {
+.btn-a-listo:hover {
   background-color: #dcfce7;
-  color: #14532d;
-  border-color: #86efac;
 }
 
-.btn-flujo-listo:hover {
-  background-color: #bbf7d0;
-}
-
-.btn-flujo-entregar {
+.btn-a-entregar {
   background-color: #15803d;
   color: #ffffff;
+  border-color: #166534;
 }
-
-.btn-flujo-entregar:hover {
+.btn-a-entregar:hover {
   background-color: #166534;
 }
 
-.btn-flujo-bloqueado {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border-color: #fca5a5;
-  cursor: not-allowed;
-  font-weight: 700;
-}
-
-.btn-flujo-bloqueado:hover {
-  background-color: #fecaca;
+.contenedor-alerta-entrega {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
 }
 
 .alerta-no-entrega {
   color: #dc2626;
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 0.775rem;
 }
 
 .btn-saldar {
-  color: #16a34a !important;
-  font-weight: 700 !important;
+  background-color: #16a34a;
+  color: #ffffff;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
-.btn-saldar:hover {
-  color: #15803d !important;
-}
-
-.botones-secundarios {
+.acciones-edicion {
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  margin-top: 0.65rem;
 }
 
 .btn-link {
   background: none;
   border: none;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   padding: 0;
@@ -1825,46 +1714,40 @@ function confirmarEliminar() {
 }
 
 .btn-editar {
-  color: #1d4ed8;
+  color: #2563eb;
 }
 
 .btn-eliminar {
   color: #dc2626;
 }
 
-/* =============================================================================
-   ESTILOS DE LAS VENTANAS EMERGENTES (MODALES FIJOS)
-   ============================================================================= */
-.modal-overlay-fijo {
+/* Modales y ventanas emergentes */
+.modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.65);
+  background-color: rgba(15, 23, 42, 0.6);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 99999;
-  padding: 12px;
-  box-sizing: border-box;
+  align-items: center;
+  padding: 1rem;
+  z-index: 50;
+  backdrop-filter: blur(2px);
 }
 
-/* Modal Formulario */
-.modal-caja-grande {
-  background: #ffffff;
-  border-radius: 8px;
+.modal-caja {
+  background-color: #ffffff;
+  border-radius: 6px;
   width: 100%;
-  max-width: 680px;
+  max-width: 600px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
 .modal-cabecera {
-  padding: 0.75rem 1.25rem;
-  background-color: #f8fafc;
-  border-bottom: 1px solid #cbd5e1;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1872,7 +1755,7 @@ function confirmarEliminar() {
 
 .modal-titulo {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #0f172a;
 }
@@ -1880,59 +1763,40 @@ function confirmarEliminar() {
 .modal-btn-x {
   background: none;
   border: none;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: #64748b;
   cursor: pointer;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
 }
 
-.modal-btn-x:hover {
-  background-color: #e2e8f0;
-  color: #0f172a;
-}
-
-.modal-formulario-cuerpo {
-  padding: 1rem 1.25rem;
+.modal-cuerpo {
+  padding: 1.25rem;
   overflow-y: auto;
-  max-height: calc(90vh - 120px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
 }
 
-.form-grid-3 {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .form-grid-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
+/* Formularios de entrada */
 .form-grid-2 {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: 1fr;
   gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 480px) {
   .form-grid-2 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 .form-grupo {
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.75rem;
 }
 
 .form-label {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #334155;
   margin-bottom: 0.25rem;
@@ -1940,7 +1804,7 @@ function confirmarEliminar() {
 
 .form-label-bold {
   display: block;
-  font-size: 0.775rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 0.35rem;
@@ -1949,10 +1813,10 @@ function confirmarEliminar() {
 .form-input,
 .form-select {
   width: 100%;
-  padding: 0.5rem 0.65rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   background-color: #ffffff;
   color: #0f172a;
   box-sizing: border-box;
@@ -1964,155 +1828,132 @@ function confirmarEliminar() {
   border-color: #2563eb;
 }
 
-.input-deshabilitado {
-  background-color: #f1f5f9;
-  color: #64748b;
-  cursor: not-allowed;
-}
-
-.form-caja-fallas {
-  background-color: #f8fafc;
+.form-textarea {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
   border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
 }
 
-.grid-checkboxes-fallas {
+.form-textarea:focus {
+  outline: 2px solid #2563eb;
+  border-color: #2563eb;
+}
+
+.grupo-reparaciones {
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.checkbox-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 0.4rem;
 }
 
-@media (min-width: 640px) {
-  .grid-checkboxes-fallas {
-    grid-template-columns: repeat(3, 1fr);
+@media (min-width: 480px) {
+  .checkbox-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 .checkbox-item {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.75rem;
+  gap: 0.4rem;
+  font-size: 0.875rem;
   color: #1e293b;
   cursor: pointer;
   user-select: none;
 }
 
-.campo-otro-bloque {
-  margin-top: 0.65rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.campo-otro-modelo {
-  margin-top: 0.5rem;
-  padding: 0.45rem;
-  background-color: #f8fafc;
-  border: 1px dashed #cbd5e1;
+.bloque-abono-condicional {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  padding: 0.75rem;
   border-radius: 4px;
+  margin-bottom: 0.75rem;
 }
 
 .sub-label {
-  font-size: 0.72rem;
+  font-size: 0.825rem;
   color: #475569;
   margin-bottom: 0.2rem;
 }
 
-.bloque-abono-condicional {
-  background-color: #fefce8;
-  border: 1px solid #fef08a;
-  border-radius: 6px;
-  padding: 0.75rem;
-}
-
 .flex-alineado {
-  justify-content: flex-end;
-  padding-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 1.2rem;
 }
 
 .texto-saldo-calculado {
-  font-size: 0.8rem;
+  font-size: 0.925rem;
   font-weight: 600;
   color: #713f12;
   margin: 0;
 }
 
-.txt-rojo {
-  color: #b91c1c;
-  margin-left: 0.25rem;
-}
-
 .form-error {
   color: #dc2626;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   margin: 0.2rem 0 0 0;
 }
 
-.modal-pie-botones {
+.modal-pie {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  border-top: 1px solid #cbd5e1;
-  padding-top: 0.85rem;
-  margin-top: 0.5rem;
+  background-color: #f8fafc;
 }
 
-.btn-cancelar {
+.btn-secundario {
   background-color: #ffffff;
   border: 1px solid #cbd5e1;
   color: #475569;
-  padding: 0.45rem 0.85rem;
-  font-size: 0.8rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.btn-cancelar:hover {
-  background-color: #f1f5f9;
-}
-
-.btn-guardar {
+.btn-primario {
   background-color: #2563eb;
   border: none;
   color: #ffffff;
-  padding: 0.45rem 1rem;
-  font-size: 0.8rem;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.875rem;
   font-weight: 600;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.btn-guardar:hover {
+.btn-primario:hover {
   background-color: #1d4ed8;
 }
 
-/* =============================================================================
-   MODAL DE ENTREGA CON ESTRELLAS INTERACTIVAS
-   ============================================================================= */
-.modal-caja-entrega {
-  background: #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 440px;
-  padding: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid #cbd5e1;
-  text-align: center;
-  box-sizing: border-box;
-}
-
+/* Modal específico de entrega y calificación */
 .entrega-cabecera {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .entrega-titulo {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
 }
@@ -2120,119 +1961,111 @@ function confirmarEliminar() {
 .modal-btn-x-simple {
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #64748b;
   cursor: pointer;
   padding: 0.2rem;
 }
 
-.entrega-info-cliente {
+.resumen-entrega-equipo {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  padding: 0.65rem;
+  padding: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .cliente-nombre-destacado {
   margin: 0;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: #0f172a;
 }
 
-.cliente-dispositivo-destacado {
-  margin: 0.2rem 0 0 0;
+.equipo-datos-destacado {
+  margin: 0.25rem 0 0 0;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: #1e40af;
 }
 
-.codigo-servicio-badge {
-  margin: 0.2rem 0 0 0;
+.id-destacado {
+  margin: 0.25rem 0 0 0;
   font-family: monospace;
-  font-size: 0.75rem;
+  font-size: 0.825rem;
   color: #64748b;
 }
 
-/* Calificación con estrellas */
 .seccion-calificacion-estrellas {
   margin: 1rem 0;
-  padding: 0.75rem;
+  padding: 0.85rem;
   border: 1px solid #fef08a;
   background-color: #fefce8;
   border-radius: 6px;
+  text-align: center;
 }
 
 .label-calificacion {
   margin: 0 0 0.4rem 0;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #713f12;
 }
 
-.fila-estrellas-interactivas {
+.fila-estrellas {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
-.boton-estrella {
+.btn-estrella {
   background: none;
   border: none;
-  font-size: 2.25rem; /* Estrellas grandes y nítidas */
-  line-height: 1;
-  color: #cbd5e1; /* Estrella apagada */
+  font-size: 1.85rem;
   cursor: pointer;
+  color: #cbd5e1;
   padding: 0 0.15rem;
   transition: transform 0.1s ease, color 0.1s ease;
 }
 
-.boton-estrella:hover {
-  transform: scale(1.2);
+.btn-estrella:hover {
+  transform: scale(1.15);
 }
 
-.boton-estrella.estrella-activa {
-  color: #f59e0b; /* Estrella dorada encendida */
+.btn-estrella.estrella-activa {
+  color: #eab308;
 }
 
 .texto-estrellas-info {
   margin: 0.5rem 0 0 0;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   color: #854d0e;
 }
 
-.nota-entrega {
-  font-size: 0.75rem;
+.nota-entrega-informativa {
+  font-size: 0.85rem;
   color: #64748b;
   margin-bottom: 1.25rem;
   background-color: #f1f5f9;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 4px;
 }
 
-.nota-entrega p {
-  margin: 0;
-}
-
 .nota-entrega-pagado {
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   color: #166534;
   margin-bottom: 1.25rem;
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 0.85rem;
   border-radius: 4px;
-}
-
-.nota-entrega-pagado p {
-  margin: 0;
 }
 
 .alerta-deuda-modal {
   background-color: #fef2f2;
   border: 1px solid #fecaca;
-  padding: 0.75rem;
+  padding: 0.85rem;
   border-radius: 6px;
   margin-bottom: 1.25rem;
   text-align: center;
@@ -2241,47 +2074,37 @@ function confirmarEliminar() {
 .alerta-deuda-titulo {
   color: #991b1b;
   font-weight: 800;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   margin: 0 0 0.35rem 0;
   letter-spacing: 0.025em;
 }
 
 .alerta-deuda-desc {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: #7f1d1d;
   margin: 0 0 0.6rem 0;
   line-height: 1.4;
 }
 
-.btn-cobrar-ahora {
+.btn-saldar-completo {
   background-color: #16a34a;
   color: #ffffff;
   border: none;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.4rem 0.85rem;
+  padding: 0.45rem 0.95rem;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
-.btn-cobrar-ahora:hover {
+.btn-saldar-completo:hover {
   background-color: #15803d;
 }
 
-.btn-deshabilitado {
-  background-color: #94a3b8 !important;
-  cursor: not-allowed !important;
-  opacity: 0.7 !important;
-}
-
-.btn-deshabilitado:hover {
-  background-color: #94a3b8 !important;
-}
-
-.entrega-botones {
+.acciones-entrega-botones {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0.75rem;
 }
 
@@ -2289,61 +2112,56 @@ function confirmarEliminar() {
   background-color: #15803d;
   color: #ffffff;
   border: none;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.85rem;
+  padding: 0.55rem 1.35rem;
+  font-size: 0.95rem;
   font-weight: 700;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 .btn-confirmar-entrega:hover {
   background-color: #166534;
 }
 
-/* Modal Eliminar */
-.modal-caja-eliminar {
-  background: #ffffff;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 380px;
-  padding: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border: 1px solid #cbd5e1;
-  text-align: center;
-  box-sizing: border-box;
+.btn-confirmar-entrega:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
+/* Modal de confirmación de eliminación */
 .eliminar-titulo {
   margin: 0 0 0.5rem 0;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #0f172a;
 }
 
 .eliminar-pregunta {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: #475569;
   margin: 0 0 1.25rem 0;
 }
 
 .eliminar-botones {
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
-.btn-confirmar-eliminar {
+.btn-peligro {
   background-color: #dc2626;
   color: #ffffff;
   border: none;
-  padding: 0.45rem 1rem;
-  font-size: 0.8rem;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.9rem;
   font-weight: 700;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.btn-confirmar-eliminar:hover {
+.btn-peligro:hover {
   background-color: #b91c1c;
 }
 </style>
