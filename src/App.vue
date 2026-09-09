@@ -418,12 +418,12 @@ function validarFormulario(): boolean {
   errorAbono.value = '';
   errorEstadoEquipo.value = '';
 
-  if (!cliente.value.trim()) {
+  if (!textoValido(cliente.value)) {
     errorCliente.value = 'El nombre del cliente es obligatorio.';
     valido = false;
   }
 
-  if (modelo.value === 'Otro modelo' && !modeloPersonalizado.value.trim()) {
+  if (modelo.value === 'Otro modelo' && !textoValido(modeloPersonalizado.value)) {
     errorModelo.value = 'Por favor escribe el modelo exacto.';
     valido = false;
   }
@@ -433,7 +433,7 @@ function validarFormulario(): boolean {
     valido = false;
   }
 
-  if (tiposReparacion.value.includes('Otro') && !otroTipoReparacion.value.trim()) {
+  if (tiposReparacion.value.includes('Otro') && !textoValido(otroTipoReparacion.value)) {
     errorReparacion.value = 'Por favor especifica el motivo en "Otro".';
     valido = false;
   }
@@ -590,6 +590,10 @@ function mostrarAlerta(msg: string) {
       mensajeNotificacion.value = '';
     }
   }, 4500);
+}
+
+function textoValido(valor: string | null | undefined): boolean {
+  return typeof valor === 'string' && valor.trim().length > 0;
 }
 </script>
 
